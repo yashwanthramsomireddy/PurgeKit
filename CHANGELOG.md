@@ -4,6 +4,27 @@ All notable changes to PurgeKit will be documented here.
 
 ---
 
+## [2.0.0] - 2026-08-26
+
+### Added
+- Full Python GUI using CustomTkinter
+- Pitch black dark mode by default, green accent
+- Compact / Spacious toggle switch in top bar
+- Checkbox per cleaning task — full control
+- Select All / Deselect All buttons
+- Windows Activity History step with radio options (Delete / Disable / Skip)
+- Live log panel with colour-coded output (success/warn/error/dim)
+- Progress bar with current step label
+- Log auto-saved to Downloads as `PurgeKit_YYYYMMDD_HHMMSS.txt` after every run
+- Manual Save Log button
+- Reboot warning dialog if T3 (pending delete) was triggered
+- Generated unique PurgeKit icon (broom + green glow)
+- UAC admin auto-relaunch on startup
+- `requirements.txt` for easy dependency install
+- `build.bat` to compile to standalone `.exe` via PyInstaller
+
+---
+
 ## [1.1.0] - 2026-08-26
 
 ### Added
