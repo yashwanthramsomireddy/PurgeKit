@@ -1,7 +1,7 @@
 # 🧹 PurgeKit
 
 > A lightweight, open-source Windows temp and cache cleaner — no installation needed.  
-> Built by [TeamExyKings](https://github.com/TeamExyKings)
+> Built by [yashwanthramsomireddy](https://github.com/yashwanthramsomireddy)
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)
@@ -116,7 +116,7 @@ PurgeKit gives you **3 options**:
 
 ### Steps
 
-1. Download `PurgeKit.bat` from [Releases](https://github.com/TeamExyKings/PurgeKit/releases)
+1. Download `PurgeKit.bat` from [Releases](https://github.com/yashwanthramsomireddy/PurgeKit/releases)
 2. Right-click the file
 3. Select **"Run as administrator"**
 4. Answer **Y** or **N** for each step
@@ -137,7 +137,7 @@ C:\Users\<YourName>\Desktop\PurgeKit_Log.txt
 
 ```
 ============================================================
-  PurgeKit v1.1  |  MIT License  |  TeamExyKings
+  PurgeKit v1.1  |  MIT License  |  yashwanthramsomireddy
   Run Date : Wed 08/26/2026  10:45:00.00
   User     : Yash
   Machine  : STERLING-PC
@@ -230,8 +230,8 @@ PurgeKit deletes temporary and cache files only. It is provided **as-is** withou
 
 ## 👤 Author
 
-**TeamExyKings**  
-GitHub: [@TeamExyKings](https://github.com/TeamExyKings)
+**yashwanthramsomireddy**  
+GitHub: [@yashwanthramsomireddy](https://github.com/yashwanthramsomireddy)
 
 ---
 
