@@ -121,5 +121,6 @@
   "free_space": "{free} free / {total}",
   "before": "Before",
   "after": "After",
-  "freed": "Freed"
+  "freed": "Freed",
+  "tab_sysinfo": "💻 SysInfo"
 }
