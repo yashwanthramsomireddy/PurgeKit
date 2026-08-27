@@ -4,6 +4,27 @@ All notable changes to PurgeKit will be documented here.
 
 ---
 
+## [3.2.0] - 2026-08-27
+
+### Added
+- **Auto-update system** — full download and install from GitHub releases:
+  - On launch, checks GitHub API for newer version
+  - About tab shows update status: ✅ up to date / 🟡 update available / ⚠ check failed
+  - "Download & Install" button appears when update found
+  - Progress bar shows download % and MB downloaded / total MB
+  - After download, a batch script replaces the exe, relaunches new version, and cleans up automatically
+  - Works only for compiled `.exe` — running via `python PurgeKit.py` shows a link to GitHub instead
+  - Retry button shown if download fails
+  - If no direct download URL found in release assets, falls back to opening GitHub releases page
+
+### Changed
+- `updater.py` now returns `(is_available, version, download_url, release_url)` — 4 values
+- `check_for_update` searches release assets for `PurgeKit.exe` download URL
+- `CURRENT_VERSION` synced to `3.2` in updater.py
+- `APP_VERSION` updated to `3.2`
+
+---
+
 ## [3.1.6] - 2026-08-27
 
 ### Fixed

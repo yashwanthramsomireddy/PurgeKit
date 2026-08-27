@@ -53,13 +53,14 @@ from core.cleaner      import (TASKS, DISK_CLEANUP_CATS, get_drives,
                                 fmt_size, run, ep, run_task, recreate, folder_size)
 from core.scanner      import scan_all, total_junk, SCAN_PATHS
 from core.lang_manager import LANGUAGES, load_lang, t
-from core.updater      import check_for_update
+from core.updater      import (check_for_update, download_update,
+                                apply_update, is_frozen, CURRENT_VERSION as UPDATER_VERSION)
 from core.scheduler    import create_schedule, remove_schedule, get_next_run, schedule_exists
 from core.startup_manager import get_startup_programs, disable_startup, enable_startup
 from core.log_manager  import write_log
 from ui.themes         import get_theme
 
-APP_VERSION  = "3.1.5"
+APP_VERSION  = "3.2"
 GITHUB_URL   = "https://github.com/yashwanthramsomireddy/PurgeKit"
 AUTHOR_NAME  = "Yashwanth Ram Somireddy"
 AUTHOR_LOC   = "Chennai, India"
@@ -1572,11 +1573,43 @@ class PurgeKitApp(ctk.CTk):
                       text_color=th["accent"], height=34, corner_radius=8,
                       command=self._open_github).pack(padx=16, pady=(0,10), fill="x")
 
-        # Update checker label
-        self.update_lbl = ctk.CTkLabel(scroll, text=t(T,"update_check"),
-                                        font=ctk.CTkFont("Segoe UI",11),
-                                        text_color=th["text_gray"])
-        self.update_lbl.pack(pady=(0,10))
+        # ── Update section ───────────────────────────────────
+        upd_f = ctk.CTkFrame(scroll, fg_color=th["bg_card"], corner_radius=10)
+        upd_f.pack(fill="x", padx=16, pady=(0,12))
+
+        self.update_status_lbl = ctk.CTkLabel(upd_f,
+                                               text=t(T,"update_check"),
+                                               font=ctk.CTkFont("Segoe UI",11),
+                                               text_color=th["text_gray"])
+        self.update_status_lbl.pack(padx=14, pady=(10,4), anchor="w")
+
+        self.update_progress_bar = ctk.CTkProgressBar(upd_f, height=8,
+                                                       fg_color=th["bg_darkest"],
+                                                       progress_color=th["accent"],
+                                                       corner_radius=4)
+        self.update_progress_bar.pack(fill="x", padx=14, pady=(0,4))
+        self.update_progress_bar.set(0)
+        self.update_progress_bar.pack_forget()  # hidden until download starts
+
+        self.update_progress_lbl = ctk.CTkLabel(upd_f, text="",
+                                                  font=ctk.CTkFont("Segoe UI",10),
+                                                  text_color=th["text_gray"])
+        self.update_progress_lbl.pack(padx=14, anchor="w")
+        self.update_progress_lbl.pack_forget()
+
+        self.update_btn = ctk.CTkButton(upd_f,
+                                         text="",
+                                         font=ctk.CTkFont("Segoe UI",12,"bold"),
+                                         height=36, corner_radius=8,
+                                         fg_color=th["accent_dark"],
+                                         hover_color=th["accent_hover"],
+                                         text_color=th["accent"],
+                                         command=self._do_update)
+        self.update_btn.pack(fill="x", padx=14, pady=(4,12))
+        self.update_btn.pack_forget()  # hidden until update found
+
+        self._update_download_url = ""
+        self._update_version      = ""
 
         ctk.CTkLabel(scroll, text=t(T,"about_desc"),
                      font=ctk.CTkFont("Segoe UI",10),
@@ -1745,25 +1778,133 @@ class PurgeKitApp(ctk.CTk):
 
     def _check_update(self):
         def _do():
-            result, ver, url = check_for_update()
+            result, ver, dl_url, rel_url = check_for_update()
             def _show():
                 try:
                     T  = self.T
                     th = self.th
                     if result is True:
-                        msg = t(T,"update_available",version=ver)
-                        color = th["warn"]
+                        # Update available
+                        self._update_version      = ver
+                        self._update_download_url = dl_url
+                        self.update_status_lbl.configure(
+                            text=f"  🟡  Update Available — v{ver} is ready to download!",
+                            text_color=th["warn"])
+                        # Show download button
+                        if dl_url:
+                            self.update_btn.configure(
+                                text=f"⬇  Download & Install v{ver}",
+                                fg_color=th["accent_dark"],
+                                text_color=th["accent"])
+                        else:
+                            self.update_btn.configure(
+                                text=f"🌐  View Release on GitHub",
+                                fg_color=th["bg_card"],
+                                text_color=th["text_white"],
+                                command=lambda: __import__("webbrowser").open(rel_url))
+                        self.update_btn.pack(fill="x", padx=14, pady=(4,12))
                     elif result is False:
-                        msg = t(T,"update_latest")
-                        color = th["text_gray"]
+                        self.update_status_lbl.configure(
+                            text=f"  ✅  You are on the latest version (v{ver})",
+                            text_color=th["text_gray"])
                     else:
-                        msg = t(T,"update_error")
-                        color = th["text_dim"]
-                    self.update_lbl.configure(text=msg, text_color=color)
+                        self.update_status_lbl.configure(
+                            text="  ⚠  Could not check for updates",
+                            text_color=th["text_dim"])
                 except Exception:
                     pass
             self.after(0, _show)
         threading.Thread(target=_do, daemon=True).start()
+
+    def _do_update(self):
+        """Handle Download & Install click."""
+        th = self.th
+        dl_url = self._update_download_url
+        ver    = self._update_version
+
+        if not dl_url:
+            import webbrowser
+            webbrowser.open("https://github.com/yashwanthramsomireddy/PurgeKit/releases")
+            return
+
+        if not is_frozen():
+            import webbrowser
+            from tkinter import messagebox
+            messagebox.showinfo(
+                "Update",
+                f"Auto-install works only with the compiled .exe version.\n\n"
+                f"Please download v{ver} manually from GitHub.")
+            webbrowser.open("https://github.com/yashwanthramsomireddy/PurgeKit/releases")
+            return
+
+        # Confirm
+        from tkinter import messagebox
+        ok = messagebox.askyesno(
+            "Update PurgeKit",
+            f"Download and install PurgeKit v{ver}?\n\n"
+            f"The app will close and relaunch automatically after updating.")
+        if not ok:
+            return
+
+        # Show progress UI
+        self.update_btn.pack_forget()
+        self.update_progress_bar.pack(fill="x", padx=14, pady=(0,4))
+        self.update_progress_bar.set(0)
+        self.update_progress_lbl.pack(padx=14, anchor="w", pady=(0,8))
+        self.update_status_lbl.configure(
+            text=f"  ⬇  Downloading v{ver}...",
+            text_color=th["accent"])
+
+        def _download():
+            def progress(pct, dl_mb, tot_mb):
+                try:
+                    self.after(0, lambda: (
+                        self.update_progress_bar.set(pct),
+                        self.update_progress_lbl.configure(
+                            text=f"  {dl_mb:.1f} MB / {tot_mb:.1f} MB  ({int(pct*100)}%)")
+                    ))
+                except Exception:
+                    pass
+
+            new_exe = download_update(dl_url, progress)
+
+            if not new_exe:
+                def _fail():
+                    self.update_status_lbl.configure(
+                        text="  ❌  Download failed. Check your internet connection.",
+                        text_color=th["error"])
+                    self.update_progress_bar.pack_forget()
+                    self.update_progress_lbl.pack_forget()
+                    self.update_btn.configure(text=f"⬇  Retry Download & Install v{ver}")
+                    self.update_btn.pack(fill="x", padx=14, pady=(4,12))
+                self.after(0, _fail)
+                return
+
+            # Apply update
+            self.after(0, lambda: self.update_status_lbl.configure(
+                text="  ✅  Download complete! Relaunching...",
+                text_color=th["success"]))
+            self.after(0, lambda: self.update_progress_bar.set(1.0))
+
+            # Short pause so user sees the success message
+            import time
+            time.sleep(1.5)
+
+            ok = apply_update(new_exe)
+            if ok:
+                # Quit current app — updater batch will relaunch
+                self.after(0, self.quit)
+            else:
+                def _apply_fail():
+                    self.update_status_lbl.configure(
+                        text="  ❌  Could not apply update. Please install manually.",
+                        text_color=th["error"])
+                    import webbrowser
+                    webbrowser.open(
+                        "https://github.com/yashwanthramsomireddy/PurgeKit/releases")
+                self.after(0, _apply_fail)
+
+        threading.Thread(target=_download, daemon=True).start()
 
     # ── Purge Engine ─────────────────────────────────────────
     def _start_purge(self):
