@@ -4,6 +4,100 @@ All notable changes to PurgeKit will be documented here.
 
 ---
 
+## [3.1.5] - 2026-08-27
+
+### Changed
+- **About tab** — removed ❤️ icon from "Built by", removed 📍 icon from Location
+- **First run wizard** — removed 📍 icon from location line
+
+---
+
+## [3.1.4] - 2026-08-27
+
+### Removed
+- **History tab** — removed entirely from compact and spacious modes (history still saved in background for future use)
+
+---
+
+## [3.1.3] - 2026-08-27
+
+### Removed
+- **Startup Programs tab** — removed entirely from both compact and spacious modes
+
+### Fixed
+- **Tasks tab — sizes now work correctly**:
+  - All task rows show their folder size (not just checked ones)
+  - Total only counts checked tasks — so Select All shows full system total
+  - Dry Run toggle, Select All, and Deselect All all trigger a size refresh
+  - Unchecked rows show size in dim color; checked rows show in accent color
+- **Dry Run + Select All** — pressing Select All then toggling Dry Run now correctly updates total size label
+
+---
+
+## [3.1.2] - 2026-08-27
+
+### Fixed
+- **Scan tab** — pressing Scan Now clears previous results, resets clean progress bar and button before showing fresh results
+- **Tasks tab sizes** — added 300ms delay before starting background size scan so all row widgets exist first; size labels now reliably update
+- **Startup tab disable/enable** — replaced immediate refresh with 400ms delayed refresh to let registry settle; improved error message when toggle fails
+
+---
+
+## [3.1.1] - 2026-08-27
+
+### Added
+- **Scan tab — Clean progress bar**: pressing "Clean Selected" now shows a progress bar and per-item status label below the buttons; button changes to "⏳ Cleaning..." while running and restores when done
+- **Tasks tab — Total size header**: a size bar below Select/Deselect shows total size of all checked tasks (live updated as background scan runs)
+- **Tasks tab — Per-row size**: each task row now shows its folder size on the right (background scan, shows "—" then updates to actual size)
+
+---
+
+## [3.1.0] - 2026-08-27
+
+### Fixed
+- **Compact mode tab spacing** — removed unsupported `tab_length` arg, fixed via segmented button font config and inner padding per tab
+- **Spacious mode navigation** — replaced missing tabview with a proper left sidebar nav with active highlight
+- **Theme applies on the fly** — changing theme/language in Settings instantly rebuilds UI, no restart needed
+- **About tab alignment** — fixed-width left column (140px), both columns left-aligned, consistent spacing
+- **Startup tab** — each program now shows Enable/Disable button, full path wraps properly (no truncation)
+- **Scan tab** — added checkboxes per result, Select All / Deselect All, and Clean Selected button
+- **Dry Run mode** — topbar shows "🔍 DRY RUN ON" indicator, START PURGE button turns orange with "DRY RUN" text, toggle in both topbar and settings in sync
+- **Taskbar / pinned icon** — uses PurgeKit icon via `SetCurrentProcessExplicitAppUserModelID` so pinned taskbar shortcut shows correct icon
+
+### Changed
+- Spacious mode now uses sidebar navigation (Tasks, Log, Scan, History, Startup, Settings, About) instead of missing tabs
+- Scan Clean Selected runs force_delete on selected paths directly
+- Log panel always visible on right side in spacious mode
+
+---
+
+## [3.0.0] - 2026-08-26
+
+### Added
+- Full project restructure into modules: core/, ui/, lang/
+- **29 languages**: English, Tamil, Hindi, Telugu, Kannada, Malayalam, Marathi, Bengali, Gujarati, Punjabi, Urdu, Spanish, French, German, Italian, Portuguese, Russian, Chinese, Japanese, Korean, Arabic, Turkish, Dutch, Polish, Vietnamese, Thai, Indonesian, Malay, Swahili
+- **Theme selector**: Green, Blue, Purple — applied across entire UI including icon
+- **First run wizard**: Language, theme, and quick options on first launch
+- **PIN Lock**: 6-digit PIN with SHA-256 hash storage, 3-attempt lockout, 30-second cooldown
+- **Dry Run mode**: Preview what would be deleted without deleting anything
+- **Junk Scanner tab**: Scans and ranks top junk folders by size
+- **Space saved history**: Bar chart + per-run history (last 50 runs)
+- **Startup Programs Manager**: View programs that run at Windows startup
+- **Settings tab**: Language, theme, dry run, autostart, PIN, scheduler, whitelist — all in one place
+- **Scheduler**: Weekly/monthly auto-purge via Windows Task Scheduler
+- **Auto-update checker**: Checks GitHub API for new releases on startup
+- **Windows toast notification**: Shows space freed after purge
+- **Whitelist / Exclude paths**: Add folders to never-delete list
+- **Remember last selection**: Saves and restores task selections between runs
+- **CLI silent mode**: `PurgeKit.exe --silent` for automation
+- **Inno Setup installer**: Professional Windows installer with Start Menu + Desktop shortcuts
+- **Logs now saved to**: `Downloads\PurgeKit\Logs\PurgeKit_YYYYMMDD_HHMMSS.txt`
+- **Tab spacing fixed**: No overlap or spacing issues in compact/spacious modes
+- **Per-step space freed**: Shows bytes freed per task in log
+- **Summary block**: Total space freed, time taken, shown at end of each run
+
+---
+
 ## [2.2.0] - 2026-08-26
 
 ### Added
