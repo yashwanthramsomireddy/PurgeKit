@@ -5,7 +5,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)
-![Version](https://img.shields.io/badge/Version-3.2-orange.svg)
+![Version](https://img.shields.io/badge/Version-3.3.1-orange.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)
 
 ---
@@ -31,6 +31,8 @@
 - ✅ **CLI silent mode** — `PurgeKit.exe --silent` for automation
 - ✅ **Compact / Spacious** view toggle
 - ✅ `C:\Downloads` is **never touched**
+- ✅ **System Info tab** — RAM, disk usage, OS info, uptime, processor
+- ✅ **Donate button** — Support via PayPal in About tab
 
 ---
 
@@ -195,16 +197,18 @@ Each log includes machine name, username, OS version, space freed per step, tech
 
 ## 🗺️ Roadmap
 
-- [x] v1.0 — `.bat` script cleaner
-- [x] v1.1 — Y/N per step, 3-technique force delete, activity history
-- [x] v2.0 — Python GUI (CustomTkinter)
-- [x] v2.1 — Per-drive cleanup, About tab, optional items
-- [x] v2.2 — Compact default, new cache locations, npm/pip
-- [x] v3.0 — 29 languages, themes, wizard, PIN lock, dry run, scanner, scheduler
-- [x] v3.1 — Sidebar nav, tab fixes, scan clean, size per row, icon fix
-- [x] v3.2 — Auto-update with download + install
-- [ ] v3.3 — Inno Setup installer (proper Windows installer)
-- [ ] v4.0 — Secure delete, PDF report export, disk health check
+- [x] v1.0 — Initial `.bat` script cleaner
+- [x] v1.1 — Y/N per step, 3-technique force delete, all temp folders, activity history
+- [x] v2.0 — Python GUI (CustomTkinter), dark theme, progress bar, log panel
+- [x] v2.1 — Per-drive disk cleanup, About tab, optional items, auto-start toggle
+- [x] v2.2 — Compact default, drive detection fix, Service Worker cache, npm/pip cache
+- [x] v3.0 — 29 languages, 3 themes, first run wizard, PIN lock, dry run, junk scanner, scheduler, auto-update check, whitelist, CLI silent mode
+- [x] v3.1 — Sidebar nav (spacious), tab spacing fix, scan Clean Selected, size per row, taskbar icon fix, theme live apply
+- [x] v3.1.x — Startup tab removed, history tab removed, size scan fixes, Optional/Dev always unchecked
+- [x] v3.2 — Auto-update with download + install + relaunch, download progress bar
+- [x] v3.3 — New cache locations (Zoom, Discord, WhatsApp, OneDrive, Defender, Teams 2.0, Maven, Gradle, Docker), System Info tab, donate button, Inno Setup installer fix
+- [x] v3.3.1 — Version consistency fix, SysInfo tab renamed, README + CHANGELOG updated
+- [ ] v4.0 — System tray, portable mode, multi-language installer
 
 ---
 
