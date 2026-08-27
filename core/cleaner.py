@@ -173,6 +173,12 @@ TASKS = [
     ("B3b", "Browser",   "Edge — Service Worker Cache",      r"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker",  True,  True,  None),
     ("D1",  "Developer", "npm Cache",                        r"%APPDATA%\npm-cache",                                             True,  False, "Clears npm package cache. Packages re-download when needed."),
     ("D2",  "Developer", "pip Cache",                        r"%LOCALAPPDATA%\pip\cache",                                        True,  False, "Clears pip package cache. Packages re-download when needed."),
+    ("D3",  "Developer", "Maven Cache",                      r"%USERPROFILE%\.m2\repository",                                    False, False, "Clears Maven local repository cache. Packages re-download when needed."),
+    ("D4",  "Developer", "Gradle Cache",                     r"%USERPROFILE%\.gradle\caches",                                    False, False, "Clears Gradle build cache. Re-downloads on next build."),
+    ("D5",  "Developer", "Docker Logs",                      r"%LOCALAPPDATA%\Docker\log",                                       False, False, "Clears Docker Desktop log files."),
+    ("D3",  "Developer", "Maven Cache",                      r"%USERPROFILE%\.m2\repository",                                    False, False, "Clears Maven local repository cache. Packages re-download when needed."),
+    ("D4",  "Developer", "Gradle Cache",                     r"%USERPROFILE%\.gradle\caches",                                    False, False, "Clears Gradle build cache. Re-downloads on next build."),
+    ("D5",  "Developer", "Docker Logs",                      r"%LOCALAPPDATA%\Docker\log",                                       False, False, "Clears Docker Desktop log files."),
     ("O1",  "Optional",  "Event Logs (App + System)",        "Windows Event Viewer Logs",                                        False, False, "Clears Application, System and Security logs. Diagnostic history lost."),
     ("O2",  "Optional",  "Recycle Bin (All Drives)",         "All Drive Recycle Bins",                                           False, False, "Permanently deletes all items in Recycle Bin across all drives."),
     ("O3",  "Optional",  "Windows Telemetry Data",           r"C:\ProgramData\Microsoft\Diagnosis",                              False, False, "Removes telemetry data sent to Microsoft."),
@@ -181,7 +187,25 @@ TASKS = [
     ("O6",  "Optional",  "NetBIOS Cache (Flush)",            "NetBIOS Name Cache",                                               False, False, "Flushes NetBIOS name cache."),
     ("O7",  "Optional",  "Winsock Reset",                    "Windows Network Stack",                                            False, False, "⚠ REQUIRES REBOOT. Use only for network issues."),
     ("O8",  "Optional",  "Windows Search Index Rebuild",     "Windows Search Index",                                             False, False, "⚠ Search slow for hours while index rebuilds."),
+    ("U13", "User",      "Zoom Cache",                       r"%APPDATA%\Zoom\data",                                             True,  True,  None),
+    ("U14", "User",      "Zoom Logs",                        r"%APPDATA%\Zoom\logs",                                             True,  True,  None),
+    ("U15", "User",      "Discord Cache",                    r"%APPDATA%\discord\Cache",                                         True,  True,  None),
+    ("U15b","User",      "Discord Code Cache",               r"%APPDATA%\discord\Code Cache",                                    True,  True,  None),
+    ("U16", "User",      "WhatsApp Desktop Cache",           r"%APPDATA%\WhatsApp\Cache",                                        True,  True,  None),
+    ("U17", "User",      "OneDrive Logs",                    r"%LOCALAPPDATA%\Microsoft\OneDrive\logs",                         True,  True,  None),
+    ("U18", "User",      "Teams 2.0 Cache",                  r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache",       True,  True,  None),
+    ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History",      True,  True,  None),
+    ("U20", "User",      "Windows Update Logs",              r"C:\Windows\Logs\WindowsUpdate",                                  True,  True,  None),
     ("O9",  "Optional",  "DNS Cache (Extra Flush)",          "System DNS Resolver",                                              False, False, "Additional DNS flush. Useful after VPN or network changes."),
+    ("U13", "User",      "Zoom Cache",                       r"%APPDATA%\Zoom\data",                                             True,  True,  None),
+    ("U14", "User",      "Zoom Logs",                        r"%APPDATA%\Zoom\logs",                                             True,  True,  None),
+    ("U15", "User",      "Discord Cache",                    r"%APPDATA%\discord\Cache",                                         True,  True,  None),
+    ("U15b","User",      "Discord Code Cache",               r"%APPDATA%\discord\Code Cache",                                    True,  True,  None),
+    ("U16", "User",      "WhatsApp Desktop Cache",           r"%APPDATA%\WhatsApp\Cache",                                        True,  True,  None),
+    ("U17", "User",      "OneDrive Logs",                    r"%LOCALAPPDATA%\Microsoft\OneDrive\logs",                         True,  True,  None),
+    ("U18", "User",      "Teams 2.0 Cache",                  r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache",       True,  True,  None),
+    ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History",      True,  True,  None),
+    ("U20", "User",      "Windows Update Logs",              r"C:\Windows\Logs\WindowsUpdate",                                  True,  True,  None),
 ]
 
 SKIP_RECREATE = {
@@ -344,6 +368,54 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
         freed += force_delete(ep(r"%LOCALAPPDATA%\pip\cache"), log_fn, reboot_flag, dry_run)
         recreate(ep(r"%LOCALAPPDATA%\pip\cache"))
         log_fn("  ✅ pip cache cleared", "success")
+    elif tid == "D3":
+        freed += force_delete(ep(r"%USERPROFILE%\.m2\repository"), log_fn, reboot_flag, dry_run)
+        log_fn("  ✅ Maven cache cleared", "success")
+    elif tid == "D4":
+        freed += force_delete(ep(r"%USERPROFILE%\.gradle\caches"), log_fn, reboot_flag, dry_run)
+        log_fn("  ✅ Gradle cache cleared", "success")
+    elif tid == "D5":
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Docker\log"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Docker\log"))
+        log_fn("  ✅ Docker logs cleared", "success")
+    elif tid == "U13":
+        run("taskkill /f /im Zoom.exe")
+        freed += force_delete(ep(r"%APPDATA%\Zoom\data"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%APPDATA%\Zoom\data"))
+        log_fn("  ✅ Zoom cache cleared", "success")
+    elif tid == "U14":
+        freed += force_delete(ep(r"%APPDATA%\Zoom\logs"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%APPDATA%\Zoom\logs"))
+        log_fn("  ✅ Zoom logs cleared", "success")
+    elif tid == "U15":
+        run("taskkill /f /im discord.exe")
+        freed += force_delete(ep(r"%APPDATA%\discord\Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%APPDATA%\discord\Cache"))
+        log_fn("  ✅ Discord cache cleared", "success")
+    elif tid == "U15b":
+        freed += force_delete(ep(r"%APPDATA%\discord\Code Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%APPDATA%\discord\Code Cache"))
+        log_fn("  ✅ Discord code cache cleared", "success")
+    elif tid == "U16":
+        run("taskkill /f /im WhatsApp.exe")
+        freed += force_delete(ep(r"%APPDATA%\WhatsApp\Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%APPDATA%\WhatsApp\Cache"))
+        log_fn("  ✅ WhatsApp cache cleared", "success")
+    elif tid == "U17":
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Microsoft\OneDrive\logs"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Microsoft\OneDrive\logs"))
+        log_fn("  ✅ OneDrive logs cleared", "success")
+    elif tid == "U18":
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache"))
+        log_fn("  ✅ Teams 2.0 cache cleared", "success")
+    elif tid == "U19":
+        freed += force_delete(r"C:\ProgramData\Microsoft\Windows Defender\Scans\History", log_fn, reboot_flag, dry_run)
+        log_fn("  ✅ Windows Defender scan history cleared", "success")
+    elif tid == "U20":
+        freed += force_delete(r"C:\Windows\Logs\WindowsUpdate", log_fn, reboot_flag, dry_run)
+        recreate(r"C:\Windows\Logs\WindowsUpdate")
+        log_fn("  ✅ Windows Update logs cleared", "success")
     elif tid == "S5":
         for sub in ["ReportQueue", "ReportArchive"]:
             p = rf"C:\ProgramData\Microsoft\Windows\WER\{sub}"
