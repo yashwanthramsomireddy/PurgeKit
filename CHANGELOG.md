@@ -4,6 +4,16 @@ All notable changes to PurgeKit will be documented here.
 
 ---
 
+## [3.1.6] - 2026-08-27
+
+### Fixed
+- **App icon** — icon now saves to `%APPDATA%\PurgeKit\purgekit.ico` and uses `iconbitmap(default=...)` which works correctly for compiled exe; exe file icon fixed via `--icon assets\icon.ico` PyInstaller flag
+- **Update checker showing false positive** — `CURRENT_VERSION` in updater.py was stuck at `3.0`, now correctly set to `3.1.5` so it won't falsely report an update
+- **generate_icon.py** — new helper script that creates `assets/icon.ico` before building
+- **build.bat** — updated to run `generate_icon.py` first and pass `--icon assets\icon.ico` to PyInstaller
+
+---
+
 ## [3.1.5] - 2026-08-27
 
 ### Changed

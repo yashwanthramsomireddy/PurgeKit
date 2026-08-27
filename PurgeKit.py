@@ -59,7 +59,7 @@ from core.startup_manager import get_startup_programs, disable_startup, enable_s
 from core.log_manager  import write_log
 from ui.themes         import get_theme
 
-APP_VERSION  = "3.1"
+APP_VERSION  = "3.1.5"
 GITHUB_URL   = "https://github.com/yashwanthramsomireddy/PurgeKit"
 AUTHOR_NAME  = "Yashwanth Ram Somireddy"
 AUTHOR_LOC   = "Chennai, India"
@@ -427,13 +427,22 @@ class PurgeKitApp(ctk.CTk):
         try:
             th  = self.th
             acc = tuple(int(th["accent"].lstrip("#")[i:i+2],16) for i in (0,2,4))
-            ico_path = save_icon_file(acc)
-            if ico_path and os.path.exists(ico_path):
-                self.iconbitmap(ico_path)
-                # Tell Windows to use this icon for taskbar grouping
-                import ctypes
-                app_id = f"TeamExyKings.PurgeKit.{APP_VERSION}"
-                ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
+
+            # Save icon to AppData so it persists for taskbar pinning
+            app_dir  = os.path.join(os.environ.get("APPDATA",""), "PurgeKit")
+            os.makedirs(app_dir, exist_ok=True)
+            ico_path = os.path.join(app_dir, "purgekit.ico")
+
+            img = generate_icon(acc)
+            img.save(ico_path, format="ICO",
+                     sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])
+
+            if os.path.exists(ico_path):
+                self.iconbitmap(default=ico_path)
+
+            # Register App User Model ID so Windows taskbar uses our icon
+            app_id = "TeamExyKings.PurgeKit"
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
         except Exception:
             pass
 
