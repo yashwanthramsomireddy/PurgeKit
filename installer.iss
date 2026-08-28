@@ -1,11 +1,11 @@
 ; ============================================================
-;  PurgeKit v3.3 — Inno Setup Installer Script
+;  PurgeKit v3.6 — Inno Setup Installer Script
 ;  MIT License — TeamExyKings
 ;  GitHub: https://github.com/yashwanthramsomireddy/PurgeKit
 ; ============================================================
 
 #define MyAppName      "PurgeKit"
-#define MyAppVersion   "3.3.1"
+#define MyAppVersion   "3.6"
 #define MyAppPublisher "TeamExyKings"
 #define MyAppURL       "https://github.com/yashwanthramsomireddy/PurgeKit"
 #define MyAppExeName   "PurgeKit.exe"
