@@ -122,5 +122,8 @@
   "before": "Before",
   "after": "After",
   "freed": "Freed",
-  "tab_sysinfo": "💻 SysInfo"
+  "tab_sysinfo": "💻 SysInfo",
+  "tab_updater": "🔄 Updates",
+  "theme_white": "White",
+  "tab_thirdparty": "📦 3rd Party"
 }
