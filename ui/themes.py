@@ -70,6 +70,28 @@ THEMES = {
         "phase_opt":    "#1a1200",
         "phase_dc":     "#180028",
     },
+    "White": {
+        "accent":       "#1a7a40",
+        "accent_dim":   "#15803d",
+        "accent_dark":  "#d4edda",
+        "accent_hover": "#b8dfc5",
+        "bg_darkest":   "#ffffff",
+        "bg_dark":      "#f8f9fa",
+        "bg_card":      "#f0f4f0",
+        "bg_hover":     "#e8f0e8",
+        "text_white":   "#1a1a1a",
+        "text_gray":    "#555555",
+        "text_dim":     "#aaaaaa",
+        "warn":         "#e65c00",
+        "error":        "#cc0000",
+        "success":      "#1a7a40",
+        "phase_system": "#d4edda",
+        "phase_user":   "#dcedc8",
+        "phase_browser":"#c8e6c9",
+        "phase_dev":    "#f1f8e9",
+        "phase_opt":    "#fff8e1",
+        "phase_dc":     "#e8f5e9",
+    },
 }
 
 def get_theme(name):
