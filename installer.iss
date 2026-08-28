@@ -1,17 +1,11 @@
 ; ============================================================
-;  PurgeKit v3.0 — Inno Setup Installer Script
+;  PurgeKit v3.3 — Inno Setup Installer Script
 ;  MIT License — TeamExyKings
 ;  GitHub: https://github.com/yashwanthramsomireddy/PurgeKit
-;
-;  How to use:
-;  1. Build PurgeKit.exe using build.bat first
-;  2. Install Inno Setup from https://jrsoftware.org/isinfo.php
-;  3. Open this .iss file in Inno Setup and click Compile
-;  4. Output: Output\Setup_PurgeKit_v3.0.exe
 ; ============================================================
 
 #define MyAppName      "PurgeKit"
-#define MyAppVersion   "3.0"
+#define MyAppVersion   "3.3.1"
 #define MyAppPublisher "TeamExyKings"
 #define MyAppURL       "https://github.com/yashwanthramsomireddy/PurgeKit"
 #define MyAppExeName   "PurgeKit.exe"
@@ -35,6 +29,7 @@ SetupIconFile=assets\icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+; Run installer as admin so app installs to Program Files properly
 PrivilegesRequired=admin
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany={#MyAppPublisher}
@@ -46,7 +41,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "startupicon"; Description: "Launch PurgeKit when Windows starts"; GroupDescription: "Startup:"; Flags: unchecked
 
 [Files]
 Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
@@ -59,20 +53,11 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
-[Registry]
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletevalue; Tasks: startupicon
-
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+; FIX: runascurrentuser prevents the elevation error after install
+Filename: "{app}\{#MyAppExeName}"; \
+  Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; \
+  Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{localappdata}\PurgeKit"
-
-[Code]
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if CurStep = ssPostInstall then
-  begin
-    // Nothing extra needed
-  end;
-end;

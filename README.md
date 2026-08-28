@@ -5,7 +5,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)
-![Version](https://img.shields.io/badge/Version-3.3.1-orange.svg)
+![Version](https://img.shields.io/badge/Version-3.6-orange.svg)
 ![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)
 
 ---
@@ -32,7 +32,10 @@
 - ✅ **Compact / Spacious** view toggle
 - ✅ `C:\Downloads` is **never touched**
 - ✅ **System Info tab** — RAM, disk usage, OS info, uptime, processor
-- ✅ **Donate button** — Support via PayPal in About tab
+- ✅ **Donate button** — Location-aware: ₹ Razorpay (India) / $ PayPal (International)
+- ✅ **3rd Party Apps tab** — Games, Communication, Adobe, Media, Dev Tools caches
+- ✅ **Per-category Select All / Deselect All** — in Tasks and 3rd Party tabs
+- ✅ **Software Updater** — winget-based, downloads official installer, open to install
 
 ---
 

@@ -58,9 +58,12 @@ from core.updater      import (check_for_update, download_update,
 from core.scheduler    import create_schedule, remove_schedule, get_next_run, schedule_exists
 from core.startup_manager import get_startup_programs, disable_startup, enable_startup
 from core.log_manager  import write_log
+from core.software_updater import (is_winget_available, get_upgradeable_apps,
+                                    download_installer, open_installer,
+                                    open_in_folder)
 from ui.themes         import get_theme
 
-APP_VERSION  = "3.2"
+APP_VERSION  = "3.6"
 GITHUB_URL   = "https://github.com/yashwanthramsomireddy/PurgeKit"
 AUTHOR_NAME  = "Yashwanth Ram Somireddy"
 AUTHOR_LOC   = "Chennai, India"
@@ -292,7 +295,7 @@ class FirstRunWizard(ctk.CTkToplevel):
                      font=ctk.CTkFont("Segoe UI",16,"bold"),
                      text_color=th["accent"]).pack(pady=(28,16))
         self._theme_var = tk.StringVar(value=self.cfg.get("theme","Green"))
-        for tname, color in [("Green","#00e676"),("Blue","#40c4ff"),("Purple","#ea80fc")]:
+        for tname, color in [("Green","#00e676"),("Blue","#40c4ff"),("Purple","#ea80fc"),("White","#1a7a40")]:
             row = ctk.CTkFrame(self, fg_color=th["bg_card"], corner_radius=8)
             row.pack(fill="x", padx=24, pady=6)
             ctk.CTkRadioButton(row, text=tname, variable=self._theme_var, value=tname,
@@ -370,18 +373,24 @@ class PurgeKitApp(ctk.CTk):
 
     # Sidebar nav items: (key, icon, builder_method)
     NAV_ITEMS = [
-        ("tab_tasks",   "🧹", "_panel_tasks"),
-        ("tab_log",     "📄", "_panel_log"),
-        ("tab_scan",    "🔍", "_panel_scan"),
-        ("tab_settings","⚙",  "_panel_settings"),
-        ("tab_about",   "ℹ",  "_panel_about"),
+        ("tab_tasks",     "🧹", "_panel_tasks"),
+        ("tab_log",       "📄", "_panel_log"),
+        ("tab_scan",      "🔍", "_panel_scan"),
+        ("tab_thirdparty","📦", "_panel_thirdparty"),
+        ("tab_sysinfo",   "💻", "_panel_sysinfo"),
+        ("tab_updater",   "🔄", "_panel_updater"),
+        ("tab_settings",  "⚙",  "_panel_settings"),
+        ("tab_about",     "ℹ",  "_panel_about"),
     ]
 
     def __init__(self):
         super().__init__()
-        ctk.set_appearance_mode("dark")
+        self.cfg = load_config()
+        if self.cfg.get("theme","Green") == "White":
+            ctk.set_appearance_mode("light")
+        else:
+            ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("green")
-
         self.cfg       = load_config()
         self.history   = load_history()
         self.whitelist = load_whitelist()
@@ -483,6 +492,11 @@ class PurgeKitApp(ctk.CTk):
         self.cfg = load_config()
         self.T   = load_lang(self.cfg.get("language","en"))
         self.th  = get_theme(self.cfg.get("theme","Green"))
+        # Switch appearance mode for White theme
+        if self.cfg.get("theme","Green") == "White":
+            ctk.set_appearance_mode("light")
+        else:
+            ctk.set_appearance_mode("dark")
         self.configure(fg_color=self.th["bg_darkest"])
         self._apply_icon()
         self._active_nav = t(self.T,"tab_tasks")
@@ -638,10 +652,13 @@ class PurgeKitApp(ctk.CTk):
         for w in self.content_area.winfo_children():
             w.destroy()
         mapping = {
-            t(self.T, "tab_tasks"):   self._panel_tasks,
-            t(self.T, "tab_scan"):    self._panel_scan,
-            t(self.T, "tab_settings"):self._panel_settings,
-            t(self.T, "tab_about"):   self._panel_about,
+            t(self.T, "tab_tasks"):      self._panel_tasks,
+            t(self.T, "tab_scan"):       self._panel_scan,
+            t(self.T, "tab_thirdparty"): self._panel_thirdparty,
+            t(self.T, "tab_sysinfo"):    self._panel_sysinfo,
+            t(self.T, "tab_updater"):    self._panel_updater,
+            t(self.T, "tab_settings"):   self._panel_settings,
+            t(self.T, "tab_about"):      self._panel_about,
         }
         builder = mapping.get(nav_label)
         if builder:
@@ -672,11 +689,14 @@ class PurgeKitApp(ctk.CTk):
         tabs.pack(fill="both", expand=True, padx=8, pady=8)
 
         tab_defs = [
-            (t(T,"tab_tasks"),   self._panel_tasks),
-            (t(T,"tab_log"),     self._panel_log),
-            (t(T,"tab_scan"),    self._panel_scan),
-            (t(T,"tab_settings"),self._panel_settings),
-            (t(T,"tab_about"),   self._panel_about),
+            (t(T,"tab_tasks"),      self._panel_tasks),
+            (t(T,"tab_log"),        self._panel_log),
+            (t(T,"tab_scan"),       self._panel_scan),
+            (t(T,"tab_thirdparty"), self._panel_thirdparty),
+            (t(T,"tab_sysinfo"),    self._panel_sysinfo),
+            (t(T,"tab_updater"),    self._panel_updater),
+            (t(T,"tab_settings"),   self._panel_settings),
+            (t(T,"tab_about"),      self._panel_about),
         ]
         for name, builder in tab_defs:
             tabs.add(name)
@@ -793,11 +813,13 @@ class PurgeKitApp(ctk.CTk):
 
         last_tasks = self.cfg.get("last_tasks", {})
         phase_meta = {
-            "System":    (th["phase_system"],  "⚙",  th["accent"], t(T,"phase_system")),
-            "User":      (th["phase_user"],    "👤", th["accent"], t(T,"phase_user")),
-            "Browser":   (th["phase_browser"], "🌐", th["accent"], t(T,"phase_browser")),
-            "Developer": (th["phase_dev"],     "💻", th["accent"], t(T,"phase_developer")),
-            "Optional":  (th["phase_opt"],     "⚠",  th["warn"],   t(T,"phase_optional")),
+            "System":     (th["phase_system"],  "⚙",   th["accent"], t(T,"phase_system")),
+            "User":       (th["phase_user"],    "👤",  th["accent"], t(T,"phase_user")),
+            "Browser":    (th["phase_browser"], "🌐",  th["accent"], t(T,"phase_browser")),
+            "Developer":  (th["phase_dev"],     "💻",  th["accent"], t(T,"phase_developer")),
+            "ThirdParty": ("#0a1520",           "📦",  th["accent"], "📦  3rd Party Apps  (unchecked by default)"),
+            "Adobe":      ("#1a0a1a",           "🎨",  "#ea80fc",    "🎨  Adobe Apps  (unchecked by default)"),
+            "Optional":   (th["phase_opt"],     "⚠",   th["warn"],   t(T,"phase_optional")),
         }
         phases = {}
         for task in TASKS:
@@ -807,13 +829,40 @@ class PurgeKitApp(ctk.CTk):
             bg, icon, hdr_c, title = phase_meta.get(phase,(th["bg_card"],"•",th["accent"],phase))
             ph_f = ctk.CTkFrame(scroll, fg_color=bg, corner_radius=8)
             ph_f.pack(fill="x", pady=(8,2), padx=2)
-            ctk.CTkLabel(ph_f, text=f"  {icon}  {title}",
+            hdr_row = ctk.CTkFrame(ph_f, fg_color="transparent")
+            hdr_row.pack(fill="x", padx=8, pady=(4,2))
+            ctk.CTkLabel(hdr_row, text=f"  {icon}  {title}",
                          font=ctk.CTkFont("Segoe UI",12,"bold"),
-                         text_color=hdr_c, anchor="w").pack(fill="x", padx=12, pady=(6,4))
+                         text_color=hdr_c, anchor="w").pack(side="left")
+            # Per-category select/deselect — capture phase in closure
+            def _make_phase_sel(ph_tasks, val):
+                def _do():
+                    for t_ in ph_tasks:
+                        if t_[0] in self.task_vars:
+                            self.task_vars[t_[0]].set(val)
+                    self.after(50, self._refresh_task_sizes)
+                return _do
+            ctk.CTkButton(hdr_row, text="✔", width=28, height=22,
+                          font=ctk.CTkFont("Segoe UI",10), corner_radius=4,
+                          fg_color=th["accent_dark"], hover_color=th["accent_hover"],
+                          text_color=th["accent"],
+                          command=_make_phase_sel(tasks, True)
+                          ).pack(side="right", padx=(0,2))
+            ctk.CTkButton(hdr_row, text="✘", width=28, height=22,
+                          font=ctk.CTkFont("Segoe UI",10), corner_radius=4,
+                          fg_color=th["bg_card"], hover_color=th["bg_hover"],
+                          text_color=th["text_gray"],
+                          command=_make_phase_sel(tasks, False)
+                          ).pack(side="right", padx=(0,4))
 
             for task in tasks:
                 tid, ph, label, path, expand, default, warning = task
-                saved   = last_tasks.get(tid)
+                # Optional and Developer phases always start unchecked
+                # Other phases restore last selection
+                if ph in ("Optional", "Developer"):
+                    saved = False
+                else:
+                    saved = last_tasks.get(tid)
                 is_wl   = any(path in w or (expand and ep(path) in w) for w in self.whitelist)
                 checked = (saved if saved is not None else default) and not is_wl
                 var = tk.BooleanVar(value=checked)
@@ -857,7 +906,14 @@ class PurgeKitApp(ctk.CTk):
         dc_f.pack(fill="x", pady=(10,2), padx=2)
         ctk.CTkLabel(dc_f, text=f"  🗑  {t(T,'phase_disk')}",
                      font=ctk.CTkFont("Segoe UI",12,"bold"),
-                     text_color=th["accent"], anchor="w").pack(fill="x", padx=12, pady=(8,4))
+                     text_color=th["accent"], anchor="w").pack(fill="x", padx=12, pady=(8,2))
+        ctk.CTkLabel(dc_f,
+                     text="  Runs Windows Disk Cleanup tool on selected drives. Only removes temp files, "
+                          "system logs, update backups, and recycle bin — never your personal files or apps.",
+                     font=ctk.CTkFont("Segoe UI",10),
+                     text_color=th["text_gray"],
+                     wraplength=620, anchor="w", justify="left"
+                     ).pack(fill="x", padx=12, pady=(0,6))
         last_drives = self.cfg.get("last_drives",[])
         self.drive_vars = {}
         for drive_path, label, free, total in get_drives():
@@ -886,11 +942,26 @@ class PurgeKitApp(ctk.CTk):
         ctk.CTkLabel(ah_f, text=f"  {t(T,'activity_desc')}",
                      font=ctk.CTkFont("Segoe UI",10),
                      text_color=th["text_gray"], anchor="w").pack(fill="x", padx=12, pady=(0,6))
-        for val, key in [("delete","activity_delete"),("disable","activity_disable"),("skip","activity_skip")]:
-            ctk.CTkRadioButton(ah_f, text=t(T,key), variable=self.activity_var, value=val,
-                               font=ctk.CTkFont("Segoe UI",11), text_color=th["text_white"],
-                               fg_color=th["accent_dark"], hover_color=th["accent_dark"],
-                               border_color=th["text_dim"]).pack(anchor="w", padx=20, pady=3)
+        for val, key, desc in [
+            ("skip",    "activity_skip",    "Do not clean activity history"),
+            ("delete",  "activity_delete",  "Delete ActivitiesCache.db (one-time clean)"),
+            ("disable", "activity_disable", "Delete + Disable Activity History permanently"),
+        ]:
+            rb = ctk.CTkRadioButton(ah_f, text=t(T,key),
+                               variable=self.activity_var, value=val,
+                               font=ctk.CTkFont("Segoe UI",11,"bold"),
+                               text_color=th["text_white"],
+                               fg_color=th["accent"],
+                               hover_color=th["accent_dim"],
+                               border_color=th["accent"],
+                               border_width_unchecked=2,
+                               border_width_checked=6,
+                               radiobutton_width=18,
+                               radiobutton_height=18)
+            rb.pack(anchor="w", padx=20, pady=4)
+            ctk.CTkLabel(ah_f, text=f"     {desc}",
+                         font=ctk.CTkFont("Segoe UI",9),
+                         text_color=th["text_dim"], anchor="w").pack(fill="x", padx=20, pady=(0,2))
         ctk.CTkFrame(ah_f, fg_color="transparent", height=8).pack()
 
         # Bottom bar
@@ -1331,7 +1402,800 @@ class PurgeKitApp(ctk.CTk):
                          font=ctk.CTkFont("Segoe UI",10),
                          text_color=th["error"]).pack(pady=20, padx=12)
 
-    # ── Settings Panel ───────────────────────────────────────
+    # ── 3rd Party Apps Panel ─────────────────────────────────
+    def _panel_thirdparty(self, parent):
+        th = self.th
+        T  = self.T
+
+        self._tp_task_vars = {}
+
+        ctk.CTkLabel(parent, text="📦  3rd Party Apps",
+                     font=ctk.CTkFont("Segoe UI",14,"bold"),
+                     text_color=th["accent"]).pack(pady=(10,2), padx=12, anchor="w")
+        ctk.CTkLabel(parent,
+                     text="Clean caches from games, communication, media, creative and dev tools. All unchecked by default.",
+                     font=ctk.CTkFont("Segoe UI",10),
+                     text_color=th["text_gray"]).pack(padx=12, anchor="w", pady=(0,4))
+
+        # Total size + select all row
+        top_row = ctk.CTkFrame(parent, fg_color=th["bg_card"], corner_radius=6)
+        top_row.pack(fill="x", padx=12, pady=(0,4))
+        self.tp_total_lbl = ctk.CTkLabel(top_row,
+                                          text="  💾  Total selected size: —",
+                                          font=ctk.CTkFont("Segoe UI",11),
+                                          text_color=th["text_gray"])
+        self.tp_total_lbl.pack(side="left", padx=8, pady=5)
+        ctk.CTkButton(top_row, text="✔ All", width=60, height=24,
+                      font=ctk.CTkFont("Segoe UI",10), corner_radius=4,
+                      fg_color=th["accent_dark"], hover_color=th["accent_hover"],
+                      text_color=th["accent"],
+                      command=lambda: [v.set(True) for v in self._tp_task_vars.values()] or self._tp_refresh_total()
+                      ).pack(side="right", padx=(0,4), pady=4)
+        ctk.CTkButton(top_row, text="✘ None", width=60, height=24,
+                      font=ctk.CTkFont("Segoe UI",10), corner_radius=4,
+                      fg_color=th["bg_card"], hover_color=th["bg_hover"],
+                      text_color=th["text_gray"],
+                      command=lambda: [v.set(False) for v in self._tp_task_vars.values()] or self._tp_refresh_total()
+                      ).pack(side="right", padx=(0,4), pady=4)
+
+        scroll = ctk.CTkScrollableFrame(parent, fg_color=th["bg_darkest"],
+                                        corner_radius=8,
+                                        scrollbar_button_color=th["accent_dark"],
+                                        scrollbar_button_hover_color=th["accent"])
+        scroll.pack(fill="both", expand=True, padx=8, pady=(0,4))
+
+        # Phase definitions: (phase_id, icon, title, bg_color, header_color)
+        tp_phases = [
+            ("Games",         "🎮", "Games & Launchers",
+             "#0a1520", th["accent"]),
+            ("Communication", "💬", "Communication Apps",
+             "#0d1a10", th["accent"]),
+            ("ThirdParty",    "📦", "Other 3rd Party Apps",
+             "#0a0a1a", th["accent"]),
+            ("Adobe",         "🎨", "Adobe Apps",
+             "#1a0a1a", "#ea80fc"),
+            ("Media",         "🎬", "Media & Creative",
+             "#1a0f0a", "#ffab40"),
+            ("DevTools",      "🔧", "Developer Tools",
+             "#0a1a0a", th["accent"]),
+        ]
+
+        from core.cleaner import TASKS, ep, folder_size
+        last_tasks = self.cfg.get("last_tasks", {})
+
+        for phase_id, icon, title, bg_col, hdr_col in tp_phases:
+            phase_tasks = [t for t in TASKS if t[1] == phase_id]
+            if not phase_tasks:
+                continue
+
+            # Phase header
+            ph_f = ctk.CTkFrame(scroll, fg_color=bg_col, corner_radius=8)
+            ph_f.pack(fill="x", pady=(8,2), padx=2)
+            hdr_row = ctk.CTkFrame(ph_f, fg_color="transparent")
+            hdr_row.pack(fill="x", padx=8, pady=(4,2))
+            ctk.CTkLabel(hdr_row,
+                         text=f"  {icon}  {title}  ({len(phase_tasks)} items)",
+                         font=ctk.CTkFont("Segoe UI",12,"bold"),
+                         text_color=hdr_col, anchor="w").pack(side="left")
+
+            # Per-category ✔ ✘
+            def _make_cat_sel(ptasks, val):
+                def _do():
+                    for t_ in ptasks:
+                        if t_[0] in self._tp_task_vars:
+                            self._tp_task_vars[t_[0]].set(val)
+                    self._tp_refresh_total()
+                return _do
+
+            ctk.CTkButton(hdr_row, text="✔", width=28, height=22,
+                          font=ctk.CTkFont("Segoe UI",10), corner_radius=4,
+                          fg_color=th["accent_dark"], hover_color=th["accent_hover"],
+                          text_color=th["accent"],
+                          command=_make_cat_sel(phase_tasks, True)
+                          ).pack(side="right", padx=(0,2))
+            ctk.CTkButton(hdr_row, text="✘", width=28, height=22,
+                          font=ctk.CTkFont("Segoe UI",10), corner_radius=4,
+                          fg_color=th["bg_card"], hover_color=th["bg_hover"],
+                          text_color=th["text_gray"],
+                          command=_make_cat_sel(phase_tasks, False)
+                          ).pack(side="right", padx=(0,4))
+
+            for task in phase_tasks:
+                tid, ph, label, path, expand, default, warning = task
+                var = tk.BooleanVar(value=False)  # Always unchecked by default
+                self._tp_task_vars[tid] = var
+
+                row = ctk.CTkFrame(scroll, fg_color=th["bg_card"], corner_radius=5)
+                row.pack(fill="x", pady=1, padx=2)
+
+                ctk.CTkCheckBox(row, text="", variable=var,
+                                fg_color=th["accent_dark"], hover_color=th["accent_dark"],
+                                checkmark_color=th["accent"], border_color=th["text_dim"],
+                                width=16, height=16,
+                                command=self._tp_refresh_total
+                                ).pack(side="left", padx=(8,4), pady=5)
+
+                ctk.CTkLabel(row, text=label,
+                             font=ctk.CTkFont("Segoe UI",11,"bold"),
+                             text_color=th["text_white"],
+                             anchor="w").pack(side="left", padx=(2,4), pady=5)
+
+                rp = ep(path) if expand else path
+                ctk.CTkLabel(row, text=rp,
+                             font=ctk.CTkFont("Segoe UI",9),
+                             text_color=th["text_dim"],
+                             anchor="e").pack(side="right", padx=(0,8))
+
+                if warning:
+                    wr = ctk.CTkFrame(scroll, fg_color="#110a00", corner_radius=3)
+                    wr.pack(fill="x", padx=12, pady=(0,1))
+                    ctk.CTkLabel(wr, text=f"  ⚠  {warning}",
+                                 font=ctk.CTkFont("Segoe UI",9),
+                                 text_color=th["warn"], anchor="w"
+                                 ).pack(fill="x", padx=6, pady=2)
+
+        # Bottom — purge button
+        bot = ctk.CTkFrame(parent, fg_color=th["bg_darkest"])
+        bot.pack(fill="x", padx=12, pady=(4,8))
+        self.tp_progress_lbl = ctk.CTkLabel(bot, text="",
+                                             font=ctk.CTkFont("Segoe UI",10),
+                                             text_color=th["text_gray"])
+        self.tp_progress_lbl.pack(anchor="w", pady=(0,2))
+        self.tp_progress_bar = ctk.CTkProgressBar(bot, height=7,
+                                                   fg_color=th["bg_card"],
+                                                   progress_color=th["accent"],
+                                                   corner_radius=3)
+        self.tp_progress_bar.pack(fill="x", pady=(0,6))
+        self.tp_progress_bar.set(0)
+
+        dry = self.dry_run_var.get()
+        self.tp_start_btn = ctk.CTkButton(bot,
+                                          text="🧹  Purge Selected 3rd Party Caches",
+                                          font=ctk.CTkFont("Segoe UI",13,"bold"),
+                                          height=40, corner_radius=8,
+                                          fg_color="#3a2000" if dry else th["accent_dark"],
+                                          hover_color=th["accent_hover"],
+                                          text_color=th["warn"] if dry else th["accent"],
+                                          command=self._tp_start_purge)
+        self.tp_start_btn.pack(fill="x")
+
+        # Kick off size scan
+        self.after(400, self._tp_refresh_total)
+
+    def _tp_refresh_total(self):
+        """Background scan total size of checked 3rd party tasks."""
+        from core.cleaner import TASKS, ep, folder_size
+        th = self.th
+        def _scan():
+            total = 0
+            for task in TASKS:
+                tid = task[0]
+                var = self._tp_task_vars.get(tid)
+                if not var or not var.get():
+                    continue
+                rp = ep(task[3]) if task[4] else task[3]
+                try:
+                    if os.path.exists(rp):
+                        total += folder_size(rp)
+                except Exception:
+                    pass
+            try:
+                self.after(0, lambda: self.tp_total_lbl.configure(
+                    text=f"  💾  Total selected size: {fmt_size(total)}",
+                    text_color=th["accent"] if total > 0 else th["text_gray"]))
+            except Exception:
+                pass
+        threading.Thread(target=_scan, daemon=True).start()
+
+    def _tp_start_purge(self):
+        from core.cleaner import TASKS, run_task, fmt_size
+        th = self.th
+        selected = [t for t in TASKS
+                    if t[0] in self._tp_task_vars and self._tp_task_vars[t[0]].get()]
+        if not selected:
+            from tkinter import messagebox
+            messagebox.showwarning("Nothing Selected", "Select at least one item to clean.")
+            return
+
+        dry = self.dry_run_var.get()
+        self.tp_start_btn.configure(state="disabled", text="⏳  Running...")
+        reboot = [False]
+        total_freed = [0]
+        done_count  = [0]
+
+        def _progress(msg):
+            try:
+                self.after(0, lambda: self.tp_progress_lbl.configure(text=msg))
+            except Exception:
+                pass
+
+        def _run():
+            for i, task in enumerate(selected):
+                pct = i / max(len(selected), 1)
+                try:
+                    self.after(0, lambda p=pct: self.tp_progress_bar.set(p))
+                except Exception:
+                    pass
+                _progress(f"[{i+1}/{len(selected)}] {task[2]}...")
+                self._log(f"\n── {task[0]}: {task[2]}", "accent")
+                freed = run_task(task[0], self._log, reboot, dry)
+                total_freed[0] += freed
+                done_count[0]  += 1
+
+            try:
+                self.after(0, lambda: (
+                    self.tp_progress_bar.set(1.0),
+                    self.tp_progress_lbl.configure(
+                        text=f"✅ Done — freed {fmt_size(total_freed[0])}"),
+                    self.tp_start_btn.configure(
+                        state="normal",
+                        text="🧹  Purge Selected 3rd Party Caches")
+                ))
+            except Exception:
+                pass
+            self._log(f"\n✅ 3rd Party purge done. Freed: {fmt_size(total_freed[0])}", "success")
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    # ── System Info Panel ────────────────────────────────────
+    def _panel_sysinfo(self, parent):
+        th = self.th
+        ctk.CTkLabel(parent, text="💻  System Info",
+                     font=ctk.CTkFont("Segoe UI",14,"bold"),
+                     text_color=th["accent"]).pack(pady=(12,8), padx=12, anchor="w")
+        scroll = ctk.CTkScrollableFrame(parent, fg_color=th["bg_darkest"],
+                                        corner_radius=8,
+                                        scrollbar_button_color=th["accent_dark"],
+                                        scrollbar_button_hover_color=th["accent"])
+        scroll.pack(fill="both", expand=True, padx=8, pady=(0,4))
+        ctk.CTkButton(parent, text="🔄  Refresh",
+                      font=ctk.CTkFont("Segoe UI",12),
+                      height=32, corner_radius=8,
+                      fg_color=th["bg_card"], hover_color=th["bg_hover"],
+                      text_color=th["text_gray"],
+                      command=lambda: self._load_sysinfo(scroll)
+                      ).pack(fill="x", padx=12, pady=(4,8))
+        self._load_sysinfo(scroll)
+
+    def _load_sysinfo(self, parent):
+        th = self.th
+        for w in parent.winfo_children():
+            w.destroy()
+
+        loading = ctk.CTkLabel(parent, text="Loading system info...",
+                               font=ctk.CTkFont("Segoe UI",11),
+                               text_color=th["text_gray"])
+        loading.pack(pady=20)
+
+        def _fetch():
+            import platform, ctypes as _ct
+            info = {}
+            info["OS"]           = platform.platform()
+            info["Machine"]      = platform.node()
+            info["Architecture"] = platform.machine()
+            info["Processor"]    = platform.processor() or "Unknown"
+
+            # RAM
+            try:
+                class MEMSTATUS(_ct.Structure):
+                    _fields_ = [
+                        ("dwLength",                _ct.c_ulong),
+                        ("dwMemoryLoad",            _ct.c_ulong),
+                        ("ullTotalPhys",            _ct.c_ulonglong),
+                        ("ullAvailPhys",            _ct.c_ulonglong),
+                        ("ullTotalPageFile",        _ct.c_ulonglong),
+                        ("ullAvailPageFile",        _ct.c_ulonglong),
+                        ("ullTotalVirtual",         _ct.c_ulonglong),
+                        ("ullAvailVirtual",         _ct.c_ulonglong),
+                        ("ullAvailExtendedVirtual", _ct.c_ulonglong),
+                    ]
+                ms = MEMSTATUS()
+                ms.dwLength = _ct.sizeof(ms)
+                _ct.windll.kernel32.GlobalMemoryStatusEx(_ct.byref(ms))
+                total_ram = ms.ullTotalPhys
+                avail_ram = ms.ullAvailPhys
+                used_ram  = total_ram - avail_ram
+                ram_pct   = (used_ram / total_ram) if total_ram else 0
+                info["RAM Total"]     = fmt_size(total_ram)
+                info["RAM Available"] = fmt_size(avail_ram)
+                info["RAM Used"]      = f"{fmt_size(used_ram)}  ({int(ram_pct*100)}%)"
+                info["_ram_pct"]      = ram_pct
+            except Exception:
+                info["RAM Total"]  = "Unavailable"
+                info["_ram_pct"]   = 0
+
+            # Windows version
+            try:
+                import winreg as _wr
+                key     = _wr.OpenKey(_wr.HKEY_LOCAL_MACHINE,
+                                       r"SOFTWARE\Microsoft\Windows NT\CurrentVersion")
+                product = _wr.QueryValueEx(key, "ProductName")[0]
+                build   = _wr.QueryValueEx(key, "CurrentBuildNumber")[0]
+                info["Windows"] = f"{product}  (Build {build})"
+                _wr.CloseKey(key)
+            except Exception:
+                info["Windows"] = platform.version()
+
+            # Uptime
+            try:
+                ms_up = _ct.windll.kernel32.GetTickCount64()
+                secs  = ms_up // 1000
+                h, m  = divmod(secs // 60, 60)
+                d, h  = divmod(h, 24)
+                info["Uptime"] = f"{d}d {h}h {m}m"
+            except Exception:
+                info["Uptime"] = "Unavailable"
+
+            # Drives
+            info["_drives"] = {}
+            for drv, label, free, total in get_drives():
+                if total > 0:
+                    used = total - free
+                    pct  = used / total
+                    name = f"{drv}  {label}" if label else drv
+                    info["_drives"][name] = (free, total, used, pct)
+
+            return info
+
+        def _render(info):
+            try:
+                loading.destroy()
+            except Exception:
+                pass
+
+            def section(title):
+                ctk.CTkLabel(parent, text=title,
+                             font=ctk.CTkFont("Segoe UI",12,"bold"),
+                             text_color=th["accent"], anchor="w"
+                             ).pack(fill="x", padx=4, pady=(10,3))
+
+            def info_row(label, value):
+                row = ctk.CTkFrame(parent, fg_color=th["bg_card"], corner_radius=6)
+                row.pack(fill="x", pady=2, padx=2)
+                ctk.CTkLabel(row, text=label,
+                             font=ctk.CTkFont("Segoe UI",11),
+                             text_color=th["text_gray"],
+                             width=140, anchor="w").pack(side="left", padx=12, pady=7)
+                ctk.CTkLabel(row, text=value,
+                             font=ctk.CTkFont("Segoe UI",11,"bold"),
+                             text_color=th["text_white"],
+                             anchor="w").pack(side="left", padx=(0,12))
+
+            def bar_row(label, value_str, pct):
+                card = ctk.CTkFrame(parent, fg_color=th["bg_card"], corner_radius=6)
+                card.pack(fill="x", pady=2, padx=2)
+                top  = ctk.CTkFrame(card, fg_color="transparent")
+                top.pack(fill="x", padx=12, pady=(7,2))
+                ctk.CTkLabel(top, text=label,
+                             font=ctk.CTkFont("Segoe UI",11),
+                             text_color=th["text_gray"],
+                             width=140, anchor="w").pack(side="left")
+                ctk.CTkLabel(top, text=value_str,
+                             font=ctk.CTkFont("Segoe UI",11,"bold"),
+                             text_color=th["text_white"],
+                             anchor="w").pack(side="left")
+                bar_color = (th["error"] if pct > 0.85 else
+                             th["warn"]  if pct > 0.65 else th["accent"])
+                bar = ctk.CTkProgressBar(card, height=8,
+                                         fg_color=th["bg_darkest"],
+                                         progress_color=bar_color,
+                                         corner_radius=4)
+                bar.pack(fill="x", padx=12, pady=(2,8))
+                bar.set(pct)
+
+            section("🖥  System")
+            info_row("Windows",       info.get("Windows",""))
+            info_row("Machine",       info.get("Machine",""))
+            info_row("Architecture",  info.get("Architecture",""))
+            info_row("Uptime",        info.get("Uptime",""))
+
+            section("🧠  Memory (RAM)")
+            bar_row("RAM Used", info.get("RAM Used",""), info.get("_ram_pct",0))
+            info_row("RAM Total",     info.get("RAM Total",""))
+            info_row("RAM Available", info.get("RAM Available",""))
+
+            section("💾  Disk Usage")
+            for drv_name, (free, total, used, pct) in info.get("_drives",{}).items():
+                bar_row(drv_name,
+                        f"{fmt_size(used)} used / {fmt_size(total)}  ({int(pct*100)}% used)",
+                        pct)
+
+            section("⚡  Processor")
+            proc = info.get("Processor","")
+            if proc and proc != "Unknown":
+                row = ctk.CTkFrame(parent, fg_color=th["bg_card"], corner_radius=6)
+                row.pack(fill="x", pady=2, padx=2)
+                ctk.CTkLabel(row, text=proc,
+                             font=ctk.CTkFont("Segoe UI",10),
+                             text_color=th["text_white"],
+                             wraplength=500, anchor="w",
+                             justify="left").pack(padx=12, pady=8, fill="x")
+
+        def _worker():
+            try:
+                data = _fetch()
+                self.after(0, lambda: _render(data))
+            except Exception as ex:
+                self.after(0, lambda: ctk.CTkLabel(
+                    parent, text=f"Error loading system info:\n{ex}",
+                    font=ctk.CTkFont("Segoe UI",10),
+                    text_color=th["error"]).pack(pady=20))
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    # ── Software Updater Panel ───────────────────────────────
+    # ── Software Updater Panel ───────────────────────────────
+    # ── Software Updater Panel ───────────────────────────────
+    def _panel_updater(self, parent):
+        th = self.th
+        self._updater_apps          = []
+        self._updater_check_vars    = {}
+        self._updater_status_labels = {}
+        self._updater_dl_btns       = {}
+        self._updater_busy          = False
+        self._updater_queue         = []
+
+        ctk.CTkLabel(parent, text="🔄  Software Updater",
+                     font=ctk.CTkFont("Segoe UI",14,"bold"),
+                     text_color=th["accent"]).pack(pady=(10,2), padx=12, anchor="w")
+        ctk.CTkLabel(parent,
+                     text="Downloads official installers via winget — you install them. One at a time, no silent execution.",
+                     font=ctk.CTkFont("Segoe UI",10),
+                     text_color=th["text_gray"]).pack(padx=12, anchor="w", pady=(0,6))
+
+        if not is_winget_available():
+            wf = ctk.CTkFrame(parent, fg_color="#1a0a00", corner_radius=8)
+            wf.pack(fill="x", padx=12, pady=(0,8))
+            ctk.CTkLabel(wf,
+                         text="⚠  winget not found. Install Windows Package Manager to use this feature.",
+                         font=ctk.CTkFont("Segoe UI",11),
+                         text_color=th["warn"], wraplength=620, justify="left"
+                         ).pack(padx=14, pady=(10,4), anchor="w")
+            ctk.CTkButton(wf, text="🌐  Get winget",
+                          font=ctk.CTkFont("Segoe UI",11), height=28,
+                          corner_radius=6, fg_color=th["bg_card"],
+                          hover_color=th["bg_hover"], text_color=th["text_white"],
+                          command=lambda: __import__("webbrowser").open("https://aka.ms/getwinget")
+                          ).pack(padx=14, pady=(0,10), anchor="w")
+            return
+
+        # Progress
+        self.upd_progress_lbl = ctk.CTkLabel(parent, text="Press Scan to check for updates.",
+                                              font=ctk.CTkFont("Segoe UI",10),
+                                              text_color=th["text_gray"])
+        self.upd_progress_lbl.pack(padx=12, anchor="w")
+        self.upd_progress_bar = ctk.CTkProgressBar(parent, height=6,
+                                                    fg_color=th["bg_card"],
+                                                    progress_color=th["accent"],
+                                                    corner_radius=3)
+        self.upd_progress_bar.pack(fill="x", padx=12, pady=(2,4))
+        self.upd_progress_bar.set(0)
+
+        # Stats row
+        stats = ctk.CTkFrame(parent, fg_color=th["bg_card"], corner_radius=6)
+        stats.pack(fill="x", padx=12, pady=(0,4))
+        self.upd_total_lbl = ctk.CTkLabel(stats, text="Updates found: —",
+                                           font=ctk.CTkFont("Segoe UI",11),
+                                           text_color=th["text_gray"])
+        self.upd_total_lbl.pack(side="left", padx=12, pady=5)
+        self.upd_sel_lbl = ctk.CTkLabel(stats, text="",
+                                         font=ctk.CTkFont("Segoe UI",10),
+                                         text_color=th["text_dim"])
+        self.upd_sel_lbl.pack(side="right", padx=12)
+
+        # Column header
+        hdr = ctk.CTkFrame(parent, fg_color=th["accent_dark"], corner_radius=6)
+        hdr.pack(fill="x", padx=12, pady=(0,2))
+        hdr.grid_columnconfigure(1, weight=1)
+        for col, (txt, w) in enumerate([
+            ("", 28), ("Application", 0), ("Current", 90),
+            ("Latest", 90), ("Source", 70), ("Status", 140)
+        ]):
+            ctk.CTkLabel(hdr, text=txt if txt else "☑",
+                         font=ctk.CTkFont("Segoe UI",10,"bold"),
+                         text_color=th["accent"],
+                         width=w, anchor="w"
+                         ).grid(row=0, column=col,
+                                padx=(8 if col==0 else 4, 4),
+                                pady=4,
+                                sticky="w" if col <= 1 else "")
+
+        # Scroll
+        self.upd_scroll = ctk.CTkScrollableFrame(parent, fg_color=th["bg_darkest"],
+                                                  corner_radius=6,
+                                                  scrollbar_button_color=th["accent_dark"],
+                                                  scrollbar_button_hover_color=th["accent"])
+        self.upd_scroll.pack(fill="both", expand=True, padx=12, pady=(0,4))
+        # Force correct bg — needed when theme changes dynamically
+        try:
+            self.upd_scroll.configure(fg_color=th["bg_darkest"])
+            self.upd_scroll._parent_canvas.configure(bg=th["bg_darkest"])
+        except Exception:
+            pass
+
+        self.upd_empty_lbl = ctk.CTkLabel(self.upd_scroll,
+                                           text="Press Scan to check for available updates.",
+                                           font=ctk.CTkFont("Segoe UI",11),
+                                           text_color=th["text_dim"])
+        self.upd_empty_lbl.pack(pady=30)
+
+        # Bottom buttons
+        btn_row = ctk.CTkFrame(parent, fg_color="transparent")
+        btn_row.pack(fill="x", padx=12, pady=(0,8))
+
+        ctk.CTkButton(btn_row, text="🔍  Scan",
+                      font=ctk.CTkFont("Segoe UI",12,"bold"),
+                      height=36, width=110, corner_radius=8,
+                      fg_color=th["accent_dark"], hover_color=th["accent_hover"],
+                      text_color=th["accent"],
+                      command=self._updater_scan).pack(side="left", padx=(0,6))
+
+        self.upd_dl_all_btn = ctk.CTkButton(btn_row, text="⬇  Download Selected",
+                                             font=ctk.CTkFont("Segoe UI",12,"bold"),
+                                             height=36, width=170, corner_radius=8,
+                                             fg_color="#1a1200", hover_color="#2a1e00",
+                                             text_color=th["warn"],
+                                             state="disabled",
+                                             command=self._updater_download_all)
+        self.upd_dl_all_btn.pack(side="left", padx=(0,6))
+
+        ctk.CTkButton(btn_row, text="✔ All",
+                      font=ctk.CTkFont("Segoe UI",11),
+                      height=36, width=70, corner_radius=8,
+                      fg_color=th["bg_card"], hover_color=th["bg_hover"],
+                      text_color=th["text_gray"],
+                      command=self._updater_select_all).pack(side="left", padx=(0,4))
+
+        ctk.CTkButton(btn_row, text="✘ None",
+                      font=ctk.CTkFont("Segoe UI",11),
+                      height=36, width=70, corner_radius=8,
+                      fg_color=th["bg_card"], hover_color=th["bg_hover"],
+                      text_color=th["text_gray"],
+                      command=self._updater_deselect_all).pack(side="left")
+
+        # Downloads folder note
+        dl_path = os.path.join(os.path.expanduser("~"), "Downloads", "PurgeKit", "Installers")
+        ctk.CTkLabel(btn_row,
+                     text=f"📁 {dl_path}",
+                     font=ctk.CTkFont("Segoe UI",9),
+                     text_color=th["text_dim"]).pack(side="right")
+
+    # ── Scan ─────────────────────────────────────────────────
+    def _updater_scan(self):
+        th = self.th
+        for w in self.upd_scroll.winfo_children():
+            w.destroy()
+        self._updater_apps          = []
+        self._updater_check_vars    = {}
+        self._updater_status_labels = {}
+        self._updater_dl_btns       = {}
+        self._updater_queue         = []
+        self._updater_busy          = False
+        self.upd_total_lbl.configure(text="Updates found: scanning...")
+        self.upd_sel_lbl.configure(text="")
+        try:
+            self.upd_dl_all_btn.configure(state="disabled")
+        except Exception:
+            pass
+
+        loading = ctk.CTkLabel(self.upd_scroll, text="⏳  Scanning installed apps...",
+                               font=ctk.CTkFont("Segoe UI",11),
+                               text_color=th["text_gray"])
+        loading.pack(pady=30)
+
+        def progress(pct, msg):
+            try:
+                self.after(0, lambda: (
+                    self.upd_progress_bar.set(pct),
+                    self.upd_progress_lbl.configure(text=msg)
+                ))
+            except Exception:
+                pass
+
+        def do_scan():
+            apps = get_upgradeable_apps(progress)
+            self._updater_apps = apps
+
+            def render():
+                try:
+                    loading.destroy()
+                except Exception:
+                    pass
+
+                if not apps:
+                    ctk.CTkLabel(self.upd_scroll,
+                                 text="✅  All your apps are up to date!",
+                                 font=ctk.CTkFont("Segoe UI",12,"bold"),
+                                 text_color=th["accent"]).pack(pady=30)
+                    self.upd_total_lbl.configure(text="Updates found: 0")
+                    return
+
+                self.upd_total_lbl.configure(text=f"Updates found: {len(apps)}")
+                try:
+                    self.upd_dl_all_btn.configure(state="normal")
+                except Exception:
+                    pass
+
+                for app in apps:
+                    app_id = app["id"]
+                    var    = tk.BooleanVar(value=True)
+                    self._updater_check_vars[app_id] = var
+
+                    row = ctk.CTkFrame(self.upd_scroll, fg_color=th["bg_card"] if th["bg_card"] != "#f0f4f0" else th["bg_card"], corner_radius=5)
+                    row.pack(fill="x", pady=1, padx=2)
+                    row.grid_columnconfigure(1, weight=1)
+
+                    # Checkbox
+                    ctk.CTkCheckBox(row, text="", variable=var,
+                                    fg_color=th["accent_dark"], hover_color=th["accent_dark"],
+                                    checkmark_color=th["accent"], border_color=th["text_dim"],
+                                    width=16, height=16,
+                                    command=self._updater_count_selected
+                                    ).grid(row=0, column=0, padx=(8,4), pady=4, sticky="w")
+
+                    # Name + id in one compact cell
+                    name_f = ctk.CTkFrame(row, fg_color="transparent")
+                    name_f.grid(row=0, column=1, padx=(2,4), pady=3, sticky="w")
+                    ctk.CTkLabel(name_f,
+                                 text=app["name"][:44] + ("…" if len(app["name"])>44 else ""),
+                                 font=ctk.CTkFont("Segoe UI",11,"bold"),
+                                 text_color=th["text_white"],
+                                 anchor="w").pack(anchor="w")
+                    ctk.CTkLabel(name_f,
+                                 text=app_id[:52],
+                                 font=ctk.CTkFont("Consolas",8),
+                                 text_color=th["text_dim"],
+                                 anchor="w").pack(anchor="w")
+
+                    # Current
+                    ctk.CTkLabel(row,
+                                 text=app["version"][:12] if app["version"] else "—",
+                                 font=ctk.CTkFont("Consolas",10),
+                                 text_color=th["text_gray"],
+                                 width=90, anchor="w"
+                                 ).grid(row=0, column=2, padx=4, pady=4)
+
+                    # Latest
+                    ctk.CTkLabel(row,
+                                 text=app["available"][:12] if app["available"] else "—",
+                                 font=ctk.CTkFont("Consolas",10,"bold"),
+                                 text_color=th["accent"],
+                                 width=90, anchor="w"
+                                 ).grid(row=0, column=3, padx=4, pady=4)
+
+                    # Source
+                    ctk.CTkLabel(row,
+                                 text=app["source"][:10] if app["source"] else "—",
+                                 font=ctk.CTkFont("Segoe UI",9),
+                                 text_color=th["text_dim"],
+                                 width=70, anchor="w"
+                                 ).grid(row=0, column=4, padx=4, pady=4)
+
+                    # Status label (shows pending / downloading / ✅ / ❌)
+                    status_lbl = ctk.CTkLabel(row, text="—",
+                                              font=ctk.CTkFont("Segoe UI",10),
+                                              text_color=th["text_dim"],
+                                              width=130, anchor="w")
+                    status_lbl.grid(row=0, column=5, padx=(4,8), pady=4)
+                    self._updater_status_labels[app_id] = status_lbl
+
+                self._updater_count_selected()
+
+            self.after(0, render)
+
+        threading.Thread(target=do_scan, daemon=True).start()
+
+    def _updater_count_selected(self):
+        try:
+            count = sum(1 for v in self._updater_check_vars.values() if v.get())
+            self.upd_sel_lbl.configure(text=f"Selected: {count}")
+        except Exception:
+            pass
+
+    def _updater_select_all(self):
+        try:
+            for v in self._updater_check_vars.values():
+                v.set(True)
+            self._updater_count_selected()
+        except Exception:
+            pass
+
+    def _updater_deselect_all(self):
+        try:
+            for v in self._updater_check_vars.values():
+                v.set(False)
+            self._updater_count_selected()
+        except Exception:
+            pass
+
+    def _updater_download_all(self):
+        """Queue all selected apps for sequential download."""
+        selected = [
+            app for app in self._updater_apps
+            if self._updater_check_vars.get(app["id"], tk.BooleanVar()).get()
+        ]
+        if not selected:
+            from tkinter import messagebox
+            messagebox.showwarning("Nothing Selected", "Select at least one app to download.")
+            return
+
+        # Build queue and start
+        self._updater_queue = list(selected)
+        self._updater_busy  = False
+
+        # Mark all selected as queued
+        for app in selected:
+            lbl = self._updater_status_labels.get(app["id"])
+            if lbl:
+                lbl.configure(text="⏳ Queued", text_color=self.th["text_dim"])
+
+        try:
+            self.upd_dl_all_btn.configure(state="disabled", text="⬇  Downloading...")
+        except Exception:
+            pass
+
+        self._updater_next_in_queue()
+
+    def _updater_next_in_queue(self):
+        """Start the next download in the queue."""
+        if not self._updater_queue:
+            # All done
+            try:
+                self.upd_dl_all_btn.configure(state="normal", text="⬇  Download Selected")
+                self.upd_progress_lbl.configure(text="✅ All downloads complete!")
+            except Exception:
+                pass
+            self._log("  ✅ All queued downloads complete.", "success")
+            return
+
+        app = self._updater_queue.pop(0)
+        self._updater_busy = True
+        app_id = app["id"]
+        name   = app["name"]
+
+        lbl = self._updater_status_labels.get(app_id)
+        if lbl:
+            lbl.configure(text="⬇ Downloading...", text_color=self.th["warn"])
+
+        remaining = len(self._updater_queue)
+        total_sel = sum(1 for v in self._updater_check_vars.values() if v.get()) + remaining + 1
+
+        def progress(pct, msg):
+            try:
+                self.after(0, lambda: (
+                    self.upd_progress_bar.set(pct),
+                    self.upd_progress_lbl.configure(text=f"[{name[:30]}]  {msg}")
+                ))
+            except Exception:
+                pass
+
+        def done(success, message, file_path):
+            self._updater_busy = False
+
+            def _ui():
+                th = self.th
+                if success and file_path and os.path.exists(file_path):
+                    fname   = os.path.basename(file_path)
+                    sz_mb   = os.path.getsize(file_path) / (1 << 20)
+                    if lbl:
+                        # Small tick + filename, no open button
+                        lbl.configure(
+                            text=f"✅ {fname[:22]}… ({sz_mb:.0f}MB)" if len(fname)>22 else f"✅ {fname} ({sz_mb:.0f}MB)",
+                            text_color=th["success"])
+                    self._log(f"  ✅ {name}: {file_path}", "success")
+                    open_in_folder(file_path)
+                else:
+                    if lbl:
+                        lbl.configure(text=f"❌ Failed", text_color=th["error"])
+                    self._log(f"  ❌ {name}: {message[:60]}", "error")
+
+                # Start next in queue
+                self.after(500, self._updater_next_in_queue)
+
+            self.after(0, _ui)
+
+        download_installer(app_id, name, progress_fn=progress, done_fn=done)
+
     def _panel_settings(self, parent):
         th = self.th
         T  = self.T
@@ -1384,7 +2248,7 @@ class PurgeKitApp(ctk.CTk):
                      font=ctk.CTkFont("Segoe UI",12),
                      text_color=th["text_white"], width=140, anchor="w").pack(side="left")
         self._theme_var_s = tk.StringVar(value=self.cfg.get("theme","Green"))
-        ctk.CTkSegmentedButton(r, values=["Green","Blue","Purple"],
+        ctk.CTkSegmentedButton(r, values=["Green","Blue","Purple","White"],
                                variable=self._theme_var_s,
                                fg_color=th["bg_darkest"],
                                selected_color=th["accent_dark"],
@@ -1610,6 +2474,91 @@ class PurgeKitApp(ctk.CTk):
 
         self._update_download_url = ""
         self._update_version      = ""
+
+        # ── Donate ────────────────────────────────────────────
+        donate_f = ctk.CTkFrame(scroll, fg_color=th["bg_card"], corner_radius=10)
+        donate_f.pack(fill="x", padx=16, pady=(0,12))
+
+        ctk.CTkLabel(donate_f, text="☕  Support PurgeKit",
+                     font=ctk.CTkFont("Segoe UI",12,"bold"),
+                     text_color=th["text_white"]).pack(pady=(12,2))
+        ctk.CTkLabel(donate_f,
+                     text="PurgeKit is free forever. If it saved you time, consider buying me a coffee!",
+                     font=ctk.CTkFont("Segoe UI",10),
+                     text_color=th["text_gray"], justify="center").pack(padx=14, pady=(0,8))
+
+        # Detect country via IP — show ₹ for India, $ for others
+        def _build_donate_buttons(is_india):
+            for w in donate_f.winfo_children():
+                if hasattr(w, "_donate_btn"):
+                    w.destroy()
+
+            if is_india:
+                # India: Razorpay primary + PayPal secondary
+                ctk.CTkLabel(donate_f, text="🇮🇳  India — Pay in ₹",
+                             font=ctk.CTkFont("Segoe UI",10,"bold"),
+                             text_color=th["accent"]).pack()
+                rz_btn = ctk.CTkButton(donate_f,
+                                       text="💸  Donate via Razorpay (₹)",
+                                       font=ctk.CTkFont("Segoe UI",12,"bold"),
+                                       height=36, corner_radius=8,
+                                       fg_color="#2d6a4f", hover_color="#1b4332",
+                                       text_color="#ffffff",
+                                       command=lambda: __import__("webbrowser").open(
+                                           "https://rzp.io/rzp/TEVSyhk"))
+                rz_btn._donate_btn = True
+                rz_btn.pack(padx=14, pady=(4,4), fill="x")
+                pp_btn = ctk.CTkButton(donate_f,
+                                       text="💛  Donate via PayPal ($)",
+                                       font=ctk.CTkFont("Segoe UI",11),
+                                       height=32, corner_radius=8,
+                                       fg_color="#003087", hover_color="#002060",
+                                       text_color="#FFC439",
+                                       command=lambda: __import__("webbrowser").open(
+                                           "https://www.paypal.com/paypalme/yash92duster"))
+                pp_btn._donate_btn = True
+                pp_btn.pack(padx=14, pady=(0,12), fill="x")
+            else:
+                # International: PayPal primary + Razorpay secondary
+                ctk.CTkLabel(donate_f, text="🌍  International — Pay in $",
+                             font=ctk.CTkFont("Segoe UI",10,"bold"),
+                             text_color=th["accent"]).pack()
+                pp_btn = ctk.CTkButton(donate_f,
+                                       text="💛  Donate via PayPal ($)",
+                                       font=ctk.CTkFont("Segoe UI",12,"bold"),
+                                       height=36, corner_radius=8,
+                                       fg_color="#003087", hover_color="#002060",
+                                       text_color="#FFC439",
+                                       command=lambda: __import__("webbrowser").open(
+                                           "https://www.paypal.com/paypalme/yash92duster"))
+                pp_btn._donate_btn = True
+                pp_btn.pack(padx=14, pady=(4,4), fill="x")
+                rz_btn = ctk.CTkButton(donate_f,
+                                       text="💸  Donate via Razorpay (₹)",
+                                       font=ctk.CTkFont("Segoe UI",11),
+                                       height=32, corner_radius=8,
+                                       fg_color="#2d6a4f", hover_color="#1b4332",
+                                       text_color="#ffffff",
+                                       command=lambda: __import__("webbrowser").open(
+                                           "https://rzp.io/rzp/TEVSyhk"))
+                rz_btn._donate_btn = True
+                rz_btn.pack(padx=14, pady=(0,12), fill="x")
+
+        # Default — show both, detect in background
+        _build_donate_buttons(False)
+
+        def _detect_location():
+            try:
+                import urllib.request, json as _json
+                with urllib.request.urlopen(
+                    "https://ipapi.co/json/", timeout=5) as r:
+                    data = _json.loads(r.read())
+                country = data.get("country_code","")
+                self.after(0, lambda: _build_donate_buttons(country == "IN"))
+            except Exception:
+                pass  # Keep default (PayPal primary)
+
+        threading.Thread(target=_detect_location, daemon=True).start()
 
         ctk.CTkLabel(scroll, text=t(T,"about_desc"),
                      font=ctk.CTkFont("Segoe UI",10),
