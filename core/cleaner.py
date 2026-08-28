@@ -194,8 +194,11 @@ TASKS = [
     ("U16", "User",      "WhatsApp Desktop Cache",           r"%APPDATA%\WhatsApp\Cache",                                        True,  True,  None),
     ("U17", "User",      "OneDrive Logs",                    r"%LOCALAPPDATA%\Microsoft\OneDrive\logs",                         True,  True,  None),
     ("U18", "User",      "Teams 2.0 Cache",                  r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache",       True,  True,  None),
-    ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History",      True,  True,  None),
+    ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History\Store",True, True, None),
     ("U20", "User",      "Windows Update Logs",              r"C:\Windows\Logs\WindowsUpdate",                                  True,  True,  None),
+    ("U21", "User",      "Downloaded Installations Cache",   r"%LOCALAPPDATA%\Downloaded Installations",                  True,  True,  None),
+    ("U22", "User",      "Squirrel Temp (App Installer Cache)",r"%LOCALAPPDATA%\SquirrelTemp",                              True,  True,  None),
+    ("U23", "User",      "iTunes Cache",                     r"%LOCALAPPDATA%\Apple Computer\iTunes",                     True,  True,  None),
     ("O9",  "Optional",  "DNS Cache (Extra Flush)",          "System DNS Resolver",                                              False, False, "Additional DNS flush. Useful after VPN or network changes."),
     ("U13", "User",      "Zoom Cache",                       r"%APPDATA%\Zoom\data",                                             True,  True,  None),
     ("U14", "User",      "Zoom Logs",                        r"%APPDATA%\Zoom\logs",                                             True,  True,  None),
@@ -206,6 +209,148 @@ TASKS = [
     ("U18", "User",      "Teams 2.0 Cache",                  r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache",       True,  True,  None),
     ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History",      True,  True,  None),
     ("U20", "User",      "Windows Update Logs",              r"C:\Windows\Logs\WindowsUpdate",                                  True,  True,  None),
+    # ── User Phase additions ─────────────────────────────────
+    ("U24", "User",      "Windows DISM Logs",                r"C:\Windows\Logs\DISM",                                           False, True,  None),
+    ("U25", "User",      "MeasuredBoot Logs",                r"C:\Windows\Logs\MeasuredBoot",                                   False, True,  None),
+    ("U26", "User",      "Windows Diagnostics Logs",         r"C:\Windows\diagnostics\system",                                  False, True,  None),
+    ("U27", "User",      "LocalService Temp",                r"C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp",  False, True,  None),
+    ("U28", "User",      "NetworkService Temp",              r"C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Temp",False, True,  None),
+    ("U29", "User",      "Jump List AutoDest",               r"%APPDATA%\Microsoft\Windows\Recent\AutomaticDestinations",      True,  True,  None),
+    ("U30", "User",      "Jump List CustomDest",             r"%APPDATA%\Microsoft\Windows\Recent\CustomDestinations",         True,  True,  None),
+    ("U31", "User",      "Temp Low Integrity",               r"%LOCALAPPDATA%\Temp\Low",                                        True,  True,  None),
+    ("U32", "User",      "CrashRpt Cache",                   r"%LOCALAPPDATA%\CrashRpt",                                         True,  True,  None),
+    ("U33", "User",      "Chrome Extension Storage Cache",   r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Storage\ext", True,  True,  None),
+    ("U34", "User",      "Edge Extension Storage Cache",     r"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Storage\ext",True,  True,  None),
+    # ── Developer Phase additions ──────────────────────────────
+    ("D6",  "Developer", "NuGet HTTP Cache",                 r"%LOCALAPPDATA%\NuGet\Cache",                                     True,  False, "Clears NuGet HTTP cache. Packages re-download when needed."),
+    ("D7",  "Developer", "NuGet Packages Cache",             r"%USERPROFILE%\.nuget\packages",                                  False, False, "Clears local NuGet package store. Re-downloads on next build."),
+    ("D8",  "Developer", "Yarn Cache",                       r"%USERPROFILE%\.cache\yarn",                                      False, False, "Clears Yarn package cache. Packages re-download when needed."),
+    ("D9",  "Developer", "pnpm Cache",                       r"%LOCALAPPDATA%\pnpm-cache",                                       True,  False, "Clears pnpm package cache. Packages re-download when needed."),
+    ("D10", "Developer", "Cargo Registry Cache",             r"%USERPROFILE%\.cargo\registry\cache",                           False, False, "Clears Rust/Cargo registry cache. Re-downloads on next build."),
+    ("D11", "Developer", "Android Studio Cache",             r"%USERPROFILE%\.android\cache",                                   True,  False, "Clears Android Studio cache files."),
+    # ── 3rd Party Apps Phase ──────────────────────────────────
+    ("T1",  "ThirdParty","Slack Cache",                      r"%LOCALAPPDATA%\slack\Cache",                                     True,  False, None),
+    ("T2",  "ThirdParty","Slack Code Cache",                 r"%LOCALAPPDATA%\slack\Code Cache",                                True,  False, None),
+    ("T3",  "ThirdParty","Postman Cache",                    r"%LOCALAPPDATA%\Postman\Cache",                                   True,  False, None),
+    ("T4",  "ThirdParty","Skype Media Cache",                r"%APPDATA%\Skype",                                                 True,  False, "Clears Skype media/chat cache. Chat history is kept."),
+    ("T5",  "ThirdParty","Google Drive Logs",                r"%LOCALAPPDATA%\Google\DriveFS\Logs",                            True,  False, None),
+    ("T6",  "ThirdParty","Dropbox Logs",                     r"%LOCALAPPDATA%\Dropbox\logs",                                    True,  False, None),
+    ("T7",  "ThirdParty","Figma Cache",                      r"%LOCALAPPDATA%\Figma\Cache",                                     True,  False, None),
+    ("T8",  "ThirdParty","WebEx Cache",                      r"%LOCALAPPDATA%\WebEx\cache",                                     True,  False, None),
+    ("T9",  "ThirdParty","Brave Browser Cache",              r"%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache", True, False, None),
+    ("T10", "ThirdParty","Vivaldi Cache",                    r"%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache",               True,  False, None),
+    ("T11", "ThirdParty","Opera Cache",                      r"%LOCALAPPDATA%\Opera Software\Opera Stable\Cache",              True,  False, None),
+    ("T12", "ThirdParty","Chrome Canary Cache",              r"%LOCALAPPDATA%\Google\Chrome SxS\User Data\Default\Cache",   True,  False, None),
+    ("T13", "ThirdParty","NVIDIA DXCache",                   r"%LOCALAPPDATA%\NVIDIA\DXCache",                                  True,  False, None),
+    ("T14", "ThirdParty","NVIDIA GLCache",                   r"%LOCALAPPDATA%\NVIDIA\GLCache",                                  True,  False, None),
+    ("T15", "ThirdParty","NVIDIA Temp",                      r"%TEMP%\nvidia",                                                   True,  False, None),
+    ("T16", "ThirdParty","AMD DxCache",                      r"%LOCALAPPDATA%\AMD\DxCache",                                     True,  False, None),
+    ("T17", "ThirdParty","Teams Meeting Add-in Cache",       r"%LOCALAPPDATA%\Microsoft\Teams\meeting-addin\Cache",          True,  False, None),
+    ("T18", "ThirdParty","Spotify UWP Cache",                r"%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache", True, False, None),
+    ("T19", "ThirdParty","CrashRpt Cache",                   r"%LOCALAPPDATA%\CrashRpt",                                        True,  False, None),
+    # ── Adobe Phase ───────────────────────────────────────────
+    ("A1",  "Adobe",     "Adobe Media Cache",                r"%APPDATA%\Adobe\Common\Media Cache",                            True,  False, "Clears Adobe media cache. Regenerates when opening projects."),
+    ("A2",  "Adobe",     "Adobe Media Cache Files",          r"%APPDATA%\Adobe\Common\Media Cache Files",                      True,  False, "Clears Adobe media cache files. Can be very large (GB+)."),
+    ("A3",  "Adobe",     "Adobe Acrobat Cache",              r"%LOCALAPPDATA%\Adobe\Acrobat\DC\Cache",                        True,  False, None),
+    ("A4",  "Adobe",     "Adobe Premiere Media Cache",       r"%APPDATA%\Adobe\Premiere Pro",                                   True,  False, "Clears Premiere Pro media cache. Regenerates on next project open."),
+    ("A5",  "Adobe",     "Adobe After Effects Disk Cache",   r"%APPDATA%\Adobe\After Effects",                                  True,  False, "Clears After Effects disk cache. Regenerates on next render."),
+    ("A6",  "Adobe",     "Adobe Photoshop Temp",             r"%TEMP%",                                                           True,  False, "Photoshop temp files are in system %TEMP% — covered by U1."),
+    ("A7",  "Adobe",     "Adobe Illustrator Cache",          r"%APPDATA%\Adobe\Adobe Illustrator",                              True,  False, None),
+    ("A8",  "Adobe",     "Adobe InDesign Cache",             r"%LOCALAPPDATA%\Adobe\InDesign",                                  True,  False, None),
+    ("A9",  "Adobe",     "Adobe XD Cache",                   r"%APPDATA%\Adobe\Adobe XD\Cache",                               True,  False, None),
+    ("A10", "Adobe",     "Adobe Lightroom Cache",            r"%APPDATA%\Adobe\Lightroom\Cache",                              True,  False, "Clears Lightroom preview cache. Regenerates when browsing photos."),
+    ("A11", "Adobe",     "Adobe Bridge Cache",               r"%APPDATA%\Adobe\Bridge",                                         True,  False, None),
+    ("A12", "Adobe",     "Creative Cloud Desktop Logs",      r"%APPDATA%\Adobe\Creative Cloud Desktop\Logs",                  True,  False, None),
+    ("A13", "Adobe",     "Creative Cloud CoreSync Cache",    r"%LOCALAPPDATA%\Adobe\CoreSync\CoreSyncCache",                  True,  False, None),
+    # ── Optional additions ────────────────────────────────────
+    ("O10", "Optional",  "Skype Media Cache (Full)",         r"%APPDATA%\Skype",                                                 True,  False, "⚠ Removes all Skype cached media. Chat history kept but media must re-download."),
+    ("O11", "Optional",  "Adobe Media Cache (Full Clean)",   r"%APPDATA%\Adobe\Common",                                        True,  False, "⚠ Removes entire Adobe Common cache. Large space gain but all projects need re-cache."),
+    # ── User Phase additions ─────────────────────────────────
+    ("U24", "User",      "Windows DISM Logs",                r"C:\Windows\Logs\DISM",                                           False, True,  None),
+    ("U25", "User",      "MeasuredBoot Logs",                r"C:\Windows\Logs\MeasuredBoot",                                   False, True,  None),
+    ("U26", "User",      "Windows Diagnostics Logs",         r"C:\Windows\diagnostics\system",                                  False, True,  None),
+    ("U27", "User",      "LocalService Temp",                r"C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp",  False, True,  None),
+    ("U28", "User",      "NetworkService Temp",              r"C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Temp",False, True,  None),
+    ("U29", "User",      "Jump List AutoDest",               r"%APPDATA%\Microsoft\Windows\Recent\AutomaticDestinations",      True,  True,  None),
+    ("U30", "User",      "Jump List CustomDest",             r"%APPDATA%\Microsoft\Windows\Recent\CustomDestinations",         True,  True,  None),
+    ("U31", "User",      "Temp Low Integrity",               r"%LOCALAPPDATA%\Temp\Low",                                        True,  True,  None),
+    ("U32", "User",      "CrashRpt Cache",                   r"%LOCALAPPDATA%\CrashRpt",                                         True,  True,  None),
+    ("U33", "User",      "Chrome Extension Storage",         r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Storage\ext", True,  True,  None),
+    ("U34", "User",      "Edge Extension Storage",           r"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Storage\ext",True,  True,  None),
+    # ── Developer additions ────────────────────────────────────
+    ("D6",  "Developer", "NuGet HTTP Cache",                 r"%LOCALAPPDATA%\NuGet\Cache",                                     True,  False, "Clears NuGet HTTP cache. Re-downloads when needed."),
+    ("D7",  "Developer", "NuGet Packages Store",             r"%USERPROFILE%\.nuget\packages",                                  False, False, "Clears NuGet local package store. Re-downloads on next build."),
+    ("D8",  "Developer", "Yarn Cache",                       r"%USERPROFILE%\.cache\yarn",                                      False, False, "Clears Yarn package cache. Re-downloads when needed."),
+    ("D9",  "Developer", "pnpm Cache",                       r"%LOCALAPPDATA%\pnpm-cache",                                       True,  False, "Clears pnpm package cache. Re-downloads when needed."),
+    ("D10", "Developer", "Cargo Registry Cache",             r"%USERPROFILE%\.cargo\registry\cache",                           False, False, "Clears Rust Cargo cache. Re-downloads on next build."),
+    ("D11", "Developer", "Android Studio Cache",             r"%USERPROFILE%\.android\cache",                                   True,  False, "Clears Android Studio cache files."),
+    # ── 3rd Party Apps ────────────────────────────────────────
+    ("T1",  "ThirdParty","Slack Cache",                      r"%LOCALAPPDATA%\slack\Cache",                                     True,  False, None),
+    ("T2",  "ThirdParty","Slack Code Cache",                 r"%LOCALAPPDATA%\slack\Code Cache",                                True,  False, None),
+    ("T3",  "ThirdParty","Postman Cache",                    r"%LOCALAPPDATA%\Postman\Cache",                                   True,  False, None),
+    ("T4",  "ThirdParty","Skype Media Cache",                r"%APPDATA%\Skype",                                                 True,  False, "Clears Skype cached media. Chat history is kept."),
+    ("T5",  "ThirdParty","Google Drive Logs",                r"%LOCALAPPDATA%\Google\DriveFS\Logs",                            True,  False, None),
+    ("T6",  "ThirdParty","Dropbox Logs",                     r"%LOCALAPPDATA%\Dropbox\logs",                                    True,  False, None),
+    ("T7",  "ThirdParty","Figma Cache",                      r"%LOCALAPPDATA%\Figma\Cache",                                     True,  False, None),
+    ("T8",  "ThirdParty","WebEx Cache",                      r"%LOCALAPPDATA%\WebEx\cache",                                     True,  False, None),
+    ("T9",  "ThirdParty","Brave Browser Cache",              r"%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache", True, False, None),
+    ("T10", "ThirdParty","Vivaldi Cache",                    r"%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache",               True,  False, None),
+    ("T11", "ThirdParty","Opera Cache",                      r"%LOCALAPPDATA%\Opera Software\Opera Stable\Cache",              True,  False, None),
+    ("T12", "ThirdParty","Chrome Canary Cache",              r"%LOCALAPPDATA%\Google\Chrome SxS\User Data\Default\Cache",   True,  False, None),
+    ("T13", "ThirdParty","NVIDIA DXCache",                   r"%LOCALAPPDATA%\NVIDIA\DXCache",                                  True,  False, None),
+    ("T14", "ThirdParty","NVIDIA GLCache",                   r"%LOCALAPPDATA%\NVIDIA\GLCache",                                  True,  False, None),
+    ("T15", "ThirdParty","NVIDIA Temp Files",                r"%TEMP%\nvidia",                                                   True,  False, None),
+    ("T16", "ThirdParty","AMD DxCache",                      r"%LOCALAPPDATA%\AMD\DxCache",                                     True,  False, None),
+    ("T17", "ThirdParty","Teams Meeting Add-in Cache",       r"%LOCALAPPDATA%\Microsoft\Teams\meeting-addin\Cache",          True,  False, None),
+    ("T18", "ThirdParty","Spotify UWP Cache",                r"%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache", True, False, None),
+    ("T19", "ThirdParty","CrashRpt Cache",                   r"%LOCALAPPDATA%\CrashRpt",                                        True,  False, None),
+    # ── Adobe Apps ────────────────────────────────────────────
+    ("A1",  "Adobe",     "Adobe Media Cache",                r"%APPDATA%\Adobe\Common\Media Cache",                            True,  False, "Clears Adobe media cache. Regenerates when opening projects."),
+    ("A2",  "Adobe",     "Adobe Media Cache Files",          r"%APPDATA%\Adobe\Common\Media Cache Files",                      True,  False, "Can be very large (GB+). Regenerates automatically."),
+    ("A3",  "Adobe",     "Adobe Acrobat DC Cache",           r"%LOCALAPPDATA%\Adobe\Acrobat\DC\Cache",                        True,  False, None),
+    ("A4",  "Adobe",     "Adobe Premiere Pro Cache",         r"%APPDATA%\Adobe\Premiere Pro",                                   True,  False, "Clears Premiere media cache. Regenerates on next project open."),
+    ("A5",  "Adobe",     "Adobe After Effects Cache",        r"%APPDATA%\Adobe\After Effects",                                  True,  False, "Clears After Effects disk cache. Regenerates on next render."),
+    ("A6",  "Adobe",     "Adobe Illustrator Cache",          r"%APPDATA%\Adobe\Adobe Illustrator",                              True,  False, None),
+    ("A7",  "Adobe",     "Adobe InDesign Cache",             r"%LOCALAPPDATA%\Adobe\InDesign",                                  True,  False, None),
+    ("A8",  "Adobe",     "Adobe XD Cache",                   r"%APPDATA%\Adobe\Adobe XD\Cache",                               True,  False, None),
+    ("A9",  "Adobe",     "Adobe Lightroom Cache",            r"%APPDATA%\Adobe\Lightroom\Cache",                              True,  False, "Clears Lightroom preview cache. Regenerates when browsing photos."),
+    ("A10", "Adobe",     "Adobe Bridge Cache",               r"%APPDATA%\Adobe\Bridge",                                         True,  False, None),
+    ("A11", "Adobe",     "Creative Cloud Desktop Logs",      r"%APPDATA%\Adobe\Creative Cloud Desktop\Logs",                  True,  False, None),
+    ("A12", "Adobe",     "Creative Cloud CoreSync Cache",    r"%LOCALAPPDATA%\Adobe\CoreSync\CoreSyncCache",                  True,  False, None),
+    # ── Optional additions ─────────────────────────────────────
+    ("O10", "Optional",  "Skype Media Cache (Full)",         r"%APPDATA%\Skype",                                                 True,  False, "⚠ Removes all Skype cached media. Chat history kept, media must re-download."),
+    ("O11", "Optional",  "Adobe Common Cache (Full)",        r"%APPDATA%\Adobe\Common",                                        True,  False, "⚠ Removes entire Adobe Common cache. Large space gain but all projects need re-cache."),
+    # ── Games & Launchers ─────────────────────────────────────
+    ("G1",  "Games",     "Steam Browser Cache",              r"%LOCALAPPDATA%\Steam\htmlcache",                                 True,  False, None),
+    ("G2",  "Games",     "Steam Logs",                       r"%LOCALAPPDATA%\Steam\logs",                                     True,  False, None),
+    ("G3",  "Games",     "Epic Games Logs",                  r"%LOCALAPPDATA%\EpicGamesLauncher\Saved\Logs",                  True,  False, None),
+    ("G4",  "Games",     "Epic Games WebCache",              r"%LOCALAPPDATA%\EpicGamesLauncher\Saved\webcache",              True,  False, None),
+    ("G5",  "Games",     "GOG Galaxy Cache",                 r"%LOCALAPPDATA%\GOG Galaxy\cache",                               True,  False, None),
+    ("G6",  "Games",     "GOG Galaxy Logs",                  r"%LOCALAPPDATA%\GOG Galaxy\Logs",                                True,  False, None),
+    ("G7",  "Games",     "Riot Client Logs",                 r"%LOCALAPPDATA%\Riot Games\Riot Client\Data\Logs",             True,  False, None),
+    ("G8",  "Games",     "Battle.net Logs",                  r"%LOCALAPPDATA%\Battle.net\Logs",                                True,  False, None),
+    ("G9",  "Games",     "Overwolf Logs",                    r"%APPDATA%\Overwolf\Logs",                                       True,  False, None),
+    ("G10", "Games",     "Origin Logs",                      r"%LOCALAPPDATA%\Origin\Logs",                                    True,  False, None),
+    ("G11", "Games",     "Ubisoft Connect Logs",             r"%LOCALAPPDATA%\Ubisoft Game Launcher\logs",                    True,  False, None),
+    ("G12", "Games",     "Ubisoft Connect Cache",            r"%LOCALAPPDATA%\Ubisoft Game Launcher\cache",                   True,  False, None),
+    # ── Communication Apps ────────────────────────────────────
+    ("C1",  "Communication","Telegram Desktop Cache",        r"%APPDATA%\Telegram Desktop\tdata\user_data\cache",           True,  False, "Clears Telegram media cache. Messages kept, media re-downloads."),
+    ("C2",  "Communication","Signal Cache",                  r"%APPDATA%\Signal\Cache",                                        True,  False, None),
+    ("C3",  "Communication","Signal Code Cache",             r"%APPDATA%\Signal\Code Cache",                                   True,  False, None),
+    ("C4",  "Communication","Outlook Offline Cache",         r"%LOCALAPPDATA%\Microsoft\Outlook\offline",                    True,  False, "⚠ Clears Outlook offline cache. Emails re-sync on next open."),
+    # ── Media & Creative ──────────────────────────────────────
+    ("M1",  "Media",     "OBS Studio Logs",                  r"%LOCALAPPDATA%\obs-studio\logs",                                True,  False, None),
+    ("M2",  "Media",     "OBS Browser Cache",                r"%LOCALAPPDATA%\obs-studio\plugin_config\obs-browser\Cache",  True,  False, None),
+    ("M3",  "Media",     "DaVinci Resolve Logs",             r"%APPDATA%\DaVinci Resolve\Support\logs",                      True,  False, None),
+    ("M4",  "Media",     "DaVinci Resolve Cache",            r"%LOCALAPPDATA%\Blackmagic Design\DaVinci Resolve\Support\CacheClip", True, False, "⚠ Can be very large (1-20 GB). Regenerates on next project render."),
+    ("M5",  "Media",     "HandBrake Logs",                   r"%LOCALAPPDATA%\HandBrake\Logs",                                True,  False, None),
+    ("M6",  "Media",     "VLC Crash Dumps",                  r"%APPDATA%\vlc\crashdump",                                      True,  False, None),
+    # ── Dev Tools ─────────────────────────────────────────────
+    ("V1",  "DevTools",  "JetBrains IDE Cache",              r"%APPDATA%\JetBrains",                                            True,  False, "Clears JetBrains cache (IntelliJ, PyCharm, WebStorm etc). Rebuilds on next IDE open."),
+    ("V2",  "DevTools",  "JetBrains Local Cache",            r"%LOCALAPPDATA%\JetBrains",                                       True,  False, None),
+    ("V3",  "DevTools",  "Visual Studio Component Cache",    r"%LOCALAPPDATA%\Microsoft\VisualStudio",                        True,  False, "Clears VS component model cache. Rebuilds on next VS launch."),
+    ("V4",  "DevTools",  "Visual Studio Temp",               r"%TEMP%\VisualStudio",                                            True,  False, None),
+    ("V5",  "DevTools",  "Electron Builder Cache",           r"%LOCALAPPDATA%\electron-builder",                                True,  False, None),
 ]
 
 SKIP_RECREATE = {
@@ -410,12 +555,28 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
         recreate(ep(r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache"))
         log_fn("  ✅ Teams 2.0 cache cleared", "success")
     elif tid == "U19":
-        freed += force_delete(r"C:\ProgramData\Microsoft\Windows Defender\Scans\History", log_fn, reboot_flag, dry_run)
+        # Only clear the Store subfolder — the full History folder can take too long
+        defender_path = r"C:\ProgramData\Microsoft\Windows Defender\Scans\History\Store"
+        freed += force_delete(defender_path, log_fn, reboot_flag, dry_run)
+        recreate(defender_path)
         log_fn("  ✅ Windows Defender scan history cleared", "success")
     elif tid == "U20":
         freed += force_delete(r"C:\Windows\Logs\WindowsUpdate", log_fn, reboot_flag, dry_run)
         recreate(r"C:\Windows\Logs\WindowsUpdate")
         log_fn("  ✅ Windows Update logs cleared", "success")
+    elif tid == "U21":
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Downloaded Installations"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Downloaded Installations"))
+        log_fn("  ✅ Downloaded Installations cache cleared", "success")
+    elif tid == "U22":
+        freed += force_delete(ep(r"%LOCALAPPDATA%\SquirrelTemp"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\SquirrelTemp"))
+        log_fn("  ✅ SquirrelTemp cache cleared", "success")
+    elif tid == "U23":
+        run("taskkill /f /im iTunes.exe")
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Apple Computer\iTunes"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Apple Computer\iTunes"))
+        log_fn("  ✅ iTunes cache cleared", "success")
     elif tid == "S5":
         for sub in ["ReportQueue", "ReportArchive"]:
             p = rf"C:\ProgramData\Microsoft\Windows\WER\{sub}"
@@ -477,6 +638,105 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
             run("sc config WSearch start= auto")
             run("net start WSearch")
         log_fn("  ✅ Search index rebuild triggered", "success")
+    # ── User additions ───────────────────────────────────────
+    elif tid in ("U24","U25","U26"):
+        freed += force_delete(rp, log_fn, reboot_flag, dry_run)
+        recreate(rp)
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("U27","U28"):
+        freed += force_delete(rp, log_fn, reboot_flag, dry_run)
+        recreate(rp)
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("U29","U30"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("U31","U32","U33","U34"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    # ── Developer additions ───────────────────────────────────
+    elif tid in ("D6","D7","D8","D9","D10","D11"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    # ── 3rd Party handlers ────────────────────────────────────
+    elif tid == "T1":
+        run("taskkill /f /im slack.exe")
+        freed += force_delete(ep(r"%LOCALAPPDATA%\slack\Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\slack\Cache"))
+        log_fn("  ✅ Slack cache cleared", "success")
+    elif tid == "T2":
+        run("taskkill /f /im slack.exe")
+        freed += force_delete(ep(r"%LOCALAPPDATA%\slack\Code Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\slack\Code Cache"))
+        log_fn("  ✅ Slack code cache cleared", "success")
+    elif tid == "T3":
+        run("taskkill /f /im Postman.exe")
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Postman\Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Postman\Cache"))
+        log_fn("  ✅ Postman cache cleared", "success")
+    elif tid == "T4":
+        run("taskkill /f /im Skype.exe")
+        freed += force_delete(ep(r"%APPDATA%\Skype"), log_fn, reboot_flag, dry_run)
+        log_fn("  ✅ Skype media cache cleared", "success")
+    elif tid in ("T5","T6","T7","T8"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("T9","T10","T11","T12"):
+        # Browser caches for alternative browsers
+        run("taskkill /f /im brave.exe")
+        run("taskkill /f /im vivaldi.exe")
+        run("taskkill /f /im opera.exe")
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("T13","T14","T15","T16"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid == "T17":
+        freed += force_delete(ep(r"%LOCALAPPDATA%\Microsoft\Teams\meeting-addin\Cache"), log_fn, reboot_flag, dry_run)
+        recreate(ep(r"%LOCALAPPDATA%\Microsoft\Teams\meeting-addin\Cache"))
+        log_fn("  ✅ Teams Meeting Add-in cache cleared", "success")
+    elif tid in ("T18","T19"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    # ── Adobe handlers ────────────────────────────────────────
+    elif tid in ("A1","A2"):
+        adobe_path = ep(rp)
+        freed += force_delete(adobe_path, log_fn, reboot_flag, dry_run)
+        recreate(adobe_path)
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","A13"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("O10","O11"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("G1","G2","G3","G4","G5","G6","G7","G8","G9","G10","G11","G12"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("C1","C2","C3","C4"):
+        run("taskkill /f /im Telegram.exe")
+        run("taskkill /f /im Signal.exe")
+        run("taskkill /f /im olk.exe")
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("M1","M2","M3","M4","M5","M6"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("V1","V2","V3","V4","V5"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
     else:
         freed += force_delete(rp, log_fn, reboot_flag, dry_run)
         if rp not in SKIP_RECREATE:
