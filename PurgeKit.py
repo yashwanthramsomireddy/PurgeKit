@@ -810,8 +810,17 @@ class PurgeKitApp(ctk.CTk):
                                         scrollbar_button_color=th["accent_dark"],
                                         scrollbar_button_hover_color=th["accent"])
         scroll.pack(fill="both", expand=True, padx=2)
+        self.update_idletasks()  # suppress flicker
 
         last_tasks = self.cfg.get("last_tasks", {})
+
+        # Suppress redraws during build
+        self.update_idletasks()
+        # Freeze redraws during bulk row creation
+        try:
+            scroll._parent_canvas.configure(state="disabled")
+        except Exception:
+            pass
         phase_meta = {
             "System":     (th["phase_system"],  "⚙",   th["accent"], t(T,"phase_system")),
             "User":       (th["phase_user"],    "👤",  th["accent"], t(T,"phase_user")),
@@ -963,6 +972,13 @@ class PurgeKitApp(ctk.CTk):
                          font=ctk.CTkFont("Segoe UI",9),
                          text_color=th["text_dim"], anchor="w").pack(fill="x", padx=20, pady=(0,2))
         ctk.CTkFrame(ah_f, fg_color="transparent", height=8).pack()
+
+        # Unfreeze after all rows built
+        try:
+            scroll._parent_canvas.configure(state="normal")
+            scroll.update_idletasks()
+        except Exception:
+            pass
 
         # Bottom bar
         bot = ctk.CTkFrame(parent, fg_color=th["bg_darkest"], corner_radius=0)
@@ -1444,6 +1460,12 @@ class PurgeKitApp(ctk.CTk):
                                         scrollbar_button_hover_color=th["accent"])
         scroll.pack(fill="both", expand=True, padx=8, pady=(0,4))
 
+        # Freeze redraws during bulk row creation
+        try:
+            scroll._parent_canvas.configure(state="disabled")
+        except Exception:
+            pass
+
         # Phase definitions: (phase_id, icon, title, bg_color, header_color)
         tp_phases = [
             ("Games",         "🎮", "Games & Launchers",
@@ -1463,6 +1485,8 @@ class PurgeKitApp(ctk.CTk):
         from core.cleaner import TASKS, ep, folder_size
         last_tasks = self.cfg.get("last_tasks", {})
 
+        # Suppress redraws during build
+        self.update_idletasks()
         for phase_id, icon, title, bg_col, hdr_col in tp_phases:
             phase_tasks = [t for t in TASKS if t[1] == phase_id]
             if not phase_tasks:
@@ -1534,6 +1558,19 @@ class PurgeKitApp(ctk.CTk):
                                  text_color=th["warn"], anchor="w"
                                  ).pack(fill="x", padx=6, pady=2)
 
+        # Unfreeze — show all rows at once
+        try:
+            scroll._parent_canvas.configure(state="normal")
+            scroll.update_idletasks()
+        except Exception:
+            pass
+
+        # Unfreeze scroll
+        try:
+            scroll._parent_canvas.configure(state="normal")
+            scroll.update_idletasks()
+        except Exception:
+            pass
         # Bottom — purge button
         bot = ctk.CTkFrame(parent, fg_color=th["bg_darkest"])
         bot.pack(fill="x", padx=12, pady=(4,8))
@@ -2016,6 +2053,15 @@ class PurgeKitApp(ctk.CTk):
                 except Exception:
                     pass
 
+                # Freeze redraws during bulk row creation — eliminates flicker
+                self.upd_scroll.pack_propagate(False)
+                try:
+                    self.upd_scroll._parent_canvas.configure(state="disabled")
+                except Exception:
+                    pass
+
+                # Build all rows then render at once — no flicker
+                self.upd_scroll.configure(fg_color=th["bg_darkest"])
                 for app in apps:
                     app_id = app["id"]
                     var    = tk.BooleanVar(value=True)
@@ -2079,7 +2125,17 @@ class PurgeKitApp(ctk.CTk):
                     status_lbl.grid(row=0, column=5, padx=(4,8), pady=4)
                     self._updater_status_labels[app_id] = status_lbl
 
+                # Unfreeze — show all rows at once
+                try:
+                    self.upd_scroll._parent_canvas.configure(state="normal")
+                except Exception:
+                    pass
+                self.upd_scroll.pack_propagate(True)
+                self.upd_scroll.update_idletasks()
+
+                self.upd_scroll.update_idletasks()
                 self._updater_count_selected()
+                self.upd_scroll.update_idletasks()
 
             self.after(0, render)
 
