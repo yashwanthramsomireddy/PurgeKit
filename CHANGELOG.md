@@ -4,20 +4,6 @@ Format: `## [version] - date | highlights`
 
 ---
 
-## [3.7.1] - 2026-09-24
-
-### Fixed
-- **`subfolder` variable error in U38/U40/U42** — broken UWP handler code was accidentally nested inside the U38 elif block from a previous edit, causing `cannot access local variable 'subfolder'` errors on those tasks even after successful completion. Completely removed and replaced with a clean handler.
-- **A6 Adobe Photoshop Temp removed** — was incorrectly pointing to `%TEMP%` (same path as U1), causing a duplicate reboot-pending schedule. Removed entirely.
-- **Log header version hardcoded as v3.0** — `write_log()` now accepts a `version` parameter; PurgeKit passes `APP_VERSION` dynamically. Log header now shows the correct version.
-- **Log auto-saves after purge completes** — no more need to manually click Save Log after every run.
-- **Windows Store popup on U12** — replaced `wsreset.exe` call (which opens the Store window as a side effect) with direct deletion of `Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache`. No window opens.
-- **U37 Power BI Desktop Cache removed** — was hanging silently with no log output due to locked Power BI process handles.
-- **U39 TeamViewer Logs removed** — was hanging silently after U38.
-- **Task timeout wrapper added** — every task now runs with a 120-second timeout via a threading wrapper. If any task hangs, the log shows `⏱ TIMEOUT (120s) — skipping` and purge moves to the next task automatically. App can never freeze indefinitely again.
-
----
-
 ## [3.7.0] - 2026-09-23
 
 ### Added
@@ -39,6 +25,14 @@ Format: `## [version] - date | highlights`
 - **Windows Defender Scan History (U19) — removed entirely** — cleaning this path takes 10-20 minutes due to 100,000+ tiny locked files; MpCmdRun.exe approach did not reliably fix the hang. Removed from task list. Users can clear via Windows Security if needed.
 - **Duplicate task definitions** — U19, U35, U36, U43-U45 were appearing twice in TASKS list due to multiple insertion attempts; deduplicated to single entries.
 - **Scroll row flicker** — Tasks, Scan, 3rd Party, Updater tabs were rendering rows one-by-one causing visible flicker. Fixed with `update_idletasks()` batching and canvas state management.
+- **`subfolder` variable error in U38/U40/U42** — broken UWP handler code was accidentally nested inside the U38 elif block from a previous edit, causing `cannot access local variable 'subfolder'` errors on those tasks even after successful completion. Completely removed and replaced with a clean handler.
+- **A6 Adobe Photoshop Temp removed** — was incorrectly pointing to `%TEMP%` (same path as U1), causing a duplicate reboot-pending schedule. Removed entirely.
+- **Log header version hardcoded as v3.0** — `write_log()` now accepts a `version` parameter; PurgeKit passes `APP_VERSION` dynamically. Log header now shows the correct version.
+- **Log auto-saves after purge completes** — no more need to manually click Save Log after every run.
+- **Windows Store popup on U12** — replaced `wsreset.exe` call (which opens the Store window as a side effect) with direct deletion of `Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache`. No window opens.
+- **U37 Power BI Desktop Cache removed** — was hanging silently with no log output due to locked Power BI process handles.
+- **U39 TeamViewer Logs removed** — was hanging silently after U38.
+- **Task timeout wrapper added** — every task now runs with a 120-second timeout via a threading wrapper. If any task hangs, the log shows `⏱ TIMEOUT (120s) — skipping` and purge moves to the next task automatically. App can never freeze indefinitely again.
 
 ### Changed
 - `APP_VERSION` → `3.7`, `CURRENT_VERSION` → `3.7`, `installer.iss` → `3.7`

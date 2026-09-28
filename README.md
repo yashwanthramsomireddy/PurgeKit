@@ -4,7 +4,6 @@
 
 **Free, open-source Windows temp & cache cleaner**
 
-![Version](https://img.shields.io/badge/Version-3.7.1-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-yellow.svg)
@@ -126,7 +125,7 @@ English, Tamil, Hindi, Telugu, Kannada, Malayalam, Marathi, Bengali, Gujarati, P
 | File | Description |
 |---|---|
 | `PurgeKit.exe` | Portable — just double-click and run |
-| `Setup_PurgeKit_v3.7.1.exe` | Windows installer — Start Menu + Desktop shortcut + uninstall |
+| `Setup_PurgeKit_v3.7.exe` | Windows installer — Start Menu + Desktop shortcut + uninstall |
 
 👉 **[Get latest release](https://github.com/yashwanthramsomireddy/PurgeKit/releases)**
 
@@ -205,7 +204,6 @@ PurgeKit/
 - [x] v3.5.3 — 104+ tasks, 3rd Party + Adobe phases
 - [x] v3.6 — 3rd Party Apps tab, per-category Select All, location-aware donate
 - [x] v3.7 — Cancel button, task timeout, UWP caches, scroll FPS boost
-- [x] v3.7.1 — Bug fixes: subfolder error, A6 path, log version, Store popup
 - [ ] v4.0 — System tray, portable mode, multi-language installer
 - [ ] v4.1 — Secure delete (DoD 3-pass), disk health check
 - [ ] v4.2 — PDF report export, run history analytics
