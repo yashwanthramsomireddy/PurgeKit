@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PurgeKit v3.6 — Social Media Kit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0a0a;font-family:'Segoe UI',sans-serif;color:#fff;}
+.shell{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:200px;background:#111;border-right:1px solid #1a1a1a;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid #1a1a1a;}
+.sidebar-logo .brand{font-size:15px;font-weight:700;color:#00e676;}
+.sidebar-logo .sub{font-size:10px;color:#444;margin-top:2px;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:12px;color:#666;border:none;background:none;width:100%;text-align:left;transition:all .15s;}
+.nav-btn:hover{background:#161616;color:#aaa;}
+.nav-btn.active{background:#003916;color:#00e676;font-weight:600;}
+.nav-btn .icon{font-size:14px;width:18px;text-align:center;}
+.main{flex:1;overflow-y:auto;padding:28px 32px;}
+.panel{display:none;}
+.panel.active{display:block;}
+h1{font-size:20px;font-weight:700;color:#00e676;margin-bottom:4px;}
+.sub-desc{font-size:12px;color:#555;margin-bottom:24px;}
+.section-title{font-size:11px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:1px;margin:24px 0 10px;}
+.card-grid{display:grid;gap:16px;}
+.card-grid.cols2{grid-template-columns:1fr 1fr;}
+.card-grid.cols3{grid-template-columns:1fr 1fr 1fr;}
+.card-wrap{background:#111;border:1px solid #1a1a1a;border-radius:10px;overflow:hidden;}
+.card-label{font-size:10px;color:#444;padding:8px 12px 4px;display:flex;justify-content:space-between;align-items:center;}
+.card-label span{color:#333;}
+canvas{display:block;width:100%;height:auto;}
+.btn{display:inline-flex;align-items:center;gap:6px;margin:8px 10px 10px;padding:7px 16px;background:#003916;color:#00e676;font-weight:600;font-size:11px;border:1px solid #00e676;border-radius:6px;cursor:pointer;transition:.15s;}
+.btn:hover{background:#00e676;color:#000;}
+.tip{font-size:10px;color:#333;padding:6px 12px 10px;border-top:1px solid #151515;}
+.caption-box{background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:16px;margin-bottom:12px;}
+.caption-platform{font-size:11px;color:#00e676;font-weight:600;margin-bottom:8px;}
+.caption-text{font-size:12px;color:#ccc;white-space:pre-wrap;font-family:'Segoe UI',sans-serif;line-height:1.6;}
+.copy-btn{margin-top:8px;padding:5px 14px;background:#003916;color:#00e676;border:1px solid #00e676;border-radius:4px;cursor:pointer;font-size:11px;}
+.copy-btn:hover{background:#00e676;color:#000;}
+.color-swatch{text-align:center;}
+.color-box{width:80px;height:80px;border-radius:10px;border:1px solid #222;}
+.color-hex{font-size:11px;color:#00e676;margin-top:6px;font-family:monospace;}
+.color-name{font-size:10px;color:#555;margin-top:2px;}
+.color-use{font-size:10px;color:#333;}
+.spec-table{width:100%;border-collapse:collapse;font-size:12px;}
+.spec-table td{padding:9px 12px;color:#ccc;border-bottom:1px solid #1a1a1a;}
+.spec-table tr:first-child td{color:#00e676;font-weight:bold;background:#003916;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">🧹 PurgeKit</div>
+      <div class="sub">Social Kit v3.6</div>
+    </div>
+    <button class="nav-btn active" onclick="show('social')" id="btn-social"><span class="icon">📱</span>Social Cards</button>
+    <button class="nav-btn" onclick="show('kit')" id="btn-kit"><span class="icon">🎨</span>Social Media Kit</button>
+    <button class="nav-btn" onclick="show('yt')" id="btn-yt"><span class="icon">▶</span>YouTube Assets</button>
+  </div>
+  <div class="main">
+
+    <!-- ══ SOCIAL CARDS ══════════════════════════════════════ -->
+    <div class="panel active" id="panel-social">
+      <h1>📱 Social Cards</h1>
+      <div class="sub-desc">Download cards for Instagram, Twitter, LinkedIn, Pinterest, WhatsApp and more</div>
+
+      <div class="section-title">🎬 Reel / Story — 1080×1920 (9:16)</div>
+      <div class="card-grid cols2">
+        <div class="card-wrap">
+          <div class="card-label">Instagram Reels / TikTok / YouTube Shorts <span>1080×1920</span></div>
+          <canvas id="reel" width="1080" height="1920" style="max-height:420px;"></canvas>
+          <button class="btn" onclick="dl('reel','PurgeKit_Reel_1080x1920.png')">⬇ Download</button>
+          <div class="tip">Instagram Reels, TikTok, YouTube Shorts</div>
+        </div>
+        <div class="card-wrap">
+          <div class="card-label">Square Post — 1080×1080 <span>1:1</span></div>
+          <canvas id="square" width="1080" height="1080" style="max-height:420px;"></canvas>
+          <button class="btn" onclick="dl('square','PurgeKit_Square_1080x1080.png')">⬇ Download</button>
+          <div class="tip">Instagram Feed, Facebook, LinkedIn</div>
+        </div>
+      </div>
+
+      <div class="section-title">🖼 Banner — 1200×630</div>
+      <div class="card-grid">
+        <div class="card-wrap">
+          <div class="card-label">Open Graph / Twitter Card <span>1200×630</span></div>
+          <canvas id="og" width="1200" height="630" style="width:100%;max-height:320px;"></canvas>
+          <button class="btn" onclick="dl('og','PurgeKit_OG_1200x630.png')">⬇ Download</button>
+          <div class="tip">Twitter/X, Facebook link previews, GitHub social preview</div>
+        </div>
+      </div>
+
+      <div class="section-title">📌 More Sizes</div>
+      <div class="card-grid cols3">
+        <div class="card-wrap">
+          <div class="card-label">Pinterest <span>1000×1500</span></div>
+          <canvas id="pin" width="1000" height="1500" style="max-height:380px;"></canvas>
+          <button class="btn" onclick="dl('pin','PurgeKit_Pinterest_1000x1500.png')">⬇ Download</button>
+        </div>
+        <div class="card-wrap">
+          <div class="card-label">WhatsApp / Telegram <span>800×800</span></div>
+          <canvas id="wa" width="800" height="800" style="max-height:380px;"></canvas>
+          <button class="btn" onclick="dl('wa','PurgeKit_WhatsApp_800x800.png')">⬇ Download</button>
+        </div>
+        <div class="card-wrap">
+          <div class="card-label">App Icon <span>512×512</span></div>
+          <canvas id="icon512" width="512" height="512" style="max-height:380px;"></canvas>
+          <button class="btn" onclick="dl('icon512','PurgeKit_Icon_512x512.png')">⬇ Download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SOCIAL MEDIA KIT ══════════════════════════════════ -->
+    <div class="panel" id="panel-kit">
+      <h1>🎨 Social Media Kit</h1>
+      <div class="sub-desc">Brand colors, ready-to-post captions, hashtags, and platform specs</div>
+
+      <div class="section-title">🎨 Brand Colors</div>
+      <div style="display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap;" id="colors-row"></div>
+
+      <div class="section-title">📝 Ready-to-Post Captions</div>
+      <div id="captions-container"></div>
+
+      <div class="section-title">#️⃣ Hashtag Sets</div>
+      <div id="hashtags-container"></div>
+
+      <div class="section-title">📐 Platform Specs</div>
+      <div style="background:#111;border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;">
+        <table class="spec-table" id="specs-table"></table>
+      </div>
+    </div>
+
+    <!-- ══ YOUTUBE ASSETS ════════════════════════════════════ -->
+    <div class="panel" id="panel-yt">
+      <h1>▶ YouTube Assets</h1>
+      <div class="sub-desc">Channel banner, thumbnails, and watermark — all downloadable</div>
+
+      <div class="section-title">🖼 Channel Banner — 2560×1440</div>
+      <div class="card-wrap" style="margin-bottom:16px;">
+        <div class="card-label">YouTube Banner — Safe zone 1546×423 centered <span>2560×1440</span></div>
+        <canvas id="yt-banner" width="2560" height="1440" style="width:100%;max-height:260px;"></canvas>
+        <button class="btn" onclick="dl('yt-banner','PurgeKit_YT_Banner_2560x1440.png')">⬇ Download Banner</button>
+        <div class="tip">Upload as channel art. Safe zone (1546×423) is what all devices see.</div>
+      </div>
+
+      <div class="section-title">🖼 Thumbnails — 1280×720</div>
+      <div class="card-grid cols2">
+        <div class="card-wrap">
+          <div class="card-label">Thumbnail A — Release <span>1280×720</span></div>
+          <canvas id="thumb-a" width="1280" height="720" style="width:100%;max-height:230px;"></canvas>
+          <button class="btn" onclick="dl('thumb-a','PurgeKit_Thumb_Release_1280x720.png')">⬇ Download</button>
+        </div>
+        <div class="card-wrap">
+          <div class="card-label">Thumbnail B — Tutorial <span>1280×720</span></div>
+          <canvas id="thumb-b" width="1280" height="720" style="width:100%;max-height:230px;"></canvas>
+          <button class="btn" onclick="dl('thumb-b','PurgeKit_Thumb_Tutorial_1280x720.png')">⬇ Download</button>
+        </div>
+        <div class="card-wrap">
+          <div class="card-label">Thumbnail C — 3rd Party <span>1280×720</span></div>
+          <canvas id="thumb-c" width="1280" height="720" style="width:100%;max-height:230px;"></canvas>
+          <button class="btn" onclick="dl('thumb-c','PurgeKit_Thumb_ThirdParty_1280x720.png')">⬇ Download</button>
+        </div>
+        <div class="card-wrap">
+          <div class="card-label">Thumbnail D — Software Updater <span>1280×720</span></div>
+          <canvas id="thumb-d" width="1280" height="720" style="width:100%;max-height:230px;"></canvas>
+          <button class="btn" onclick="dl('thumb-d','PurgeKit_Thumb_SoftUpdater_1280x720.png')">⬇ Download</button>
+        </div>
+      </div>
+
+      <div class="section-title">💧 Watermark — 200×200</div>
+      <div class="card-wrap" style="display:inline-block;margin-bottom:16px;">
+        <div class="card-label">Watermark <span>200×200</span></div>
+        <canvas id="watermark" width="200" height="200"></canvas>
+        <button class="btn" onclick="dl('watermark','PurgeKit_Watermark_200x200.png')">⬇ Download</button>
+        <div class="tip">Place bottom-right at ~8% opacity</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+// ── Nav ──────────────────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('btn-'+id).classList.add('active');
+}
+function dl(id,fn){
+  const a=document.createElement('a');a.download=fn;
+  a.href=document.getElementById(id).toDataURL('image/png');a.click();
+}
+
+// ── Brand ─────────────────────────────────────────────────────
+const ACCENT='#00e676',ACCENT2='#00c853',DARK='#003916',BG='#0a0a0a';
+
+// ── Draw helpers ──────────────────────────────────────────────
+function grid(ctx,W,H,gap,color){
+  ctx.strokeStyle=color||'rgba(0,230,118,0.03)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=gap){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=gap){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+function glow(ctx,cx,cy,r,color,alpha){
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+  g.addColorStop(0,`rgba(0,230,118,${alpha})`);g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+}
+function dots(ctx,x,y,cols,rows,gap){
+  for(let i=0;i<cols;i++)for(let j=0;j<rows;j++){
+    ctx.beginPath();ctx.arc(x+i*gap,y+j*gap,1.5,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,230,118,${0.05+(i+j)*0.006})`;ctx.fill();
+  }
+}
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+function broom(ctx,cx,cy,r,color){
+  ctx.strokeStyle=color;ctx.lineWidth=r*0.12;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx,cy-r*0.6);ctx.lineTo(cx,cy+r*0.1);ctx.stroke();
+  const sw=[-0.45,-0.28,-0.10,0.08,0.26,0.44,0.62];
+  sw.forEach((o,i)=>{
+    ctx.strokeStyle=`rgba(0,230,118,${Math.max(0.3,1-Math.abs(o)*1.2)})`;
+    ctx.lineWidth=r*0.08;ctx.beginPath();
+    ctx.moveTo(cx,cy+r*0.1);ctx.lineTo(cx+o*r*1.1,cy+r*0.7);ctx.stroke();
+  });
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(cx,cy-r*0.62,r*0.08,0,Math.PI*2);ctx.fill();
+}
+function bgBase(ctx,W,H){
+  ctx.fillStyle='#050d08';ctx.fillRect(0,0,W,H);
+  grid(ctx,W,H,60);
+}
+function accentLines(ctx,W,H){
+  ctx.strokeStyle='rgba(0,230,118,0.25)';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(0,6);ctx.lineTo(W,6);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,H-6);ctx.lineTo(W,H-6);ctx.stroke();
+}
+function versionBadge(ctx,cx,cy,text,fontSize){
+  ctx.font=`bold ${fontSize}px "Segoe UI",Arial`;
+  const tw=ctx.measureText(text).width,pad=fontSize,h=fontSize*1.8;
+  rr(ctx,cx-tw/2-pad,cy-h/2,tw+pad*2,h,h/2);
+  ctx.fillStyle='rgba(0,230,118,0.12)';ctx.fill();
+  ctx.strokeStyle='#00e676';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle='#00e676';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(text,cx,cy);
+}
+function footer(ctx,W,H,text){
+  ctx.textAlign='center';ctx.textBaseline='bottom';
+  ctx.font='bold 26px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.4)';
+  ctx.fillText('github.com/yashwanthramsomireddy/PurgeKit',W/2,H-30);
+  ctx.font='22px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.18)';
+  ctx.fillText(text||'MIT License · Yashwanth Ram Somireddy · TeamExyKings',W/2,H-60);
+}
+
+// ══ REEL 1080×1920 ═══════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('reel'),ctx=c.getContext('2d'),W=1080,H=1920;
+  bgBase(ctx,W,H);glow(ctx,W/2,H*0.35,520,ACCENT,0.15);
+  dots(ctx,60,80,12,8,68);dots(ctx,W-60-11*68,H-80-7*68,12,8,68);
+  accentLines(ctx,W,H);
+  ctx.beginPath();ctx.arc(W/2,H*0.35,200,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,230,118,0.12)';ctx.lineWidth=2;ctx.stroke();
+  broom(ctx,W/2,H*0.35,140,ACCENT);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 108px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W/2,H*0.575);
+  ctx.font='42px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.65)';
+  ctx.fillText('Windows Temp & Cache Cleaner',W/2,H*0.634);
+  ctx.strokeStyle='rgba(0,230,118,0.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W*0.15,H*0.665);ctx.lineTo(W*0.85,H*0.665);ctx.stroke();
+  versionBadge(ctx,W/2,H*0.695,'v3.6 — Free & Open Source',28);
+  const feats=[
+    '🧹  Temp, Cache & Browser Cleanup',
+    '📦  3rd Party App Caches (New!)',
+    '🔄  Software Updater via winget',
+    '🔍  Junk Scanner with Size View',
+    '💻  System Info — RAM & Disk',
+    '🌐  29 Languages · 4 Themes',
+    '🔐  PIN Lock · Dry Run · Scheduler',
+  ];
+  ctx.textAlign='left';ctx.textBaseline='top';
+  feats.forEach((f,i)=>{
+    ctx.font=i===0?'bold 36px "Segoe UI",Arial':'36px "Segoe UI",Arial';
+    ctx.fillStyle=i===0?ACCENT:'rgba(255,255,255,0.82)';
+    ctx.fillText(f,W*0.1,H*0.74+i*76);
+  });
+  footer(ctx,W,H);
+})();
+
+// ══ SQUARE 1080×1080 ══════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('square'),ctx=c.getContext('2d'),W=1080,H=1080;
+  bgBase(ctx,W,H);glow(ctx,W/2,H/2,450,ACCENT,0.13);
+  dots(ctx,40,40,10,6,70);accentLines(ctx,W,H);
+  broom(ctx,W/2,H*0.32,130,ACCENT);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 98px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W/2,H*0.555);
+  ctx.font='34px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.fillText('Free Windows Cleaner · v3.6',W/2,H*0.622);
+  const feats=['🧹 Temp & Cache','📦 3rd Party Apps','🔄 SW Updater','🌐 29 Languages'];
+  const fw=240;let fx=W/2-(feats.length*fw/2)+fw/2;
+  feats.forEach(f=>{
+    rr(ctx,fx-fw/2+10,H*0.695,fw-20,58,8);
+    ctx.fillStyle='rgba(0,230,118,0.08)';ctx.fill();
+    ctx.strokeStyle='rgba(0,230,118,0.2)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.82)';ctx.font='26px "Segoe UI",Arial';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f,fx,H*0.695+29);fx+=fw;
+  });
+  ctx.textAlign='center';ctx.textBaseline='bottom';
+  ctx.font='bold 24px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.4)';
+  ctx.fillText('github.com/yashwanthramsomireddy/PurgeKit',W/2,H-20);
+})();
+
+// ══ OG 1200×630 ═══════════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('og'),ctx=c.getContext('2d'),W=1200,H=630;
+  bgBase(ctx,W,H);glow(ctx,300,H/2,320,ACCENT,0.18);
+  dots(ctx,W-200,20,5,4,50);accentLines(ctx,W,H);
+  broom(ctx,260,H/2,160,ACCENT);
+  ctx.strokeStyle='rgba(0,230,118,0.15)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(480,60);ctx.lineTo(480,H-60);ctx.stroke();
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.font='bold 86px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',500,85);
+  ctx.font='27px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.fillText('Windows Temp & Cache Cleaner — v3.6',500,192);
+  const feats=['🧹 Temp, Cache & Browser Cleanup','📦 3rd Party App Caches (New in v3.6)','🔄 Software Updater via winget','🌐 29 Languages · 4 Themes · PIN Lock'];
+  ctx.font='23px "Segoe UI",Arial';
+  feats.forEach((f,i)=>{ctx.fillStyle=i===0?ACCENT:'rgba(255,255,255,0.78)';ctx.fillText(f,500,258+i*54);});
+  rr(ctx,500,520,200,46,23);ctx.fillStyle='rgba(0,230,118,0.12)';ctx.fill();
+  ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=ACCENT;ctx.font='bold 21px "Segoe UI",Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('Free Download',600,543);
+  ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.font='19px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.35)';
+  ctx.fillText('MIT License · TeamExyKings',W-28,H-18);
+})();
+
+// ══ PINTEREST 1000×1500 ════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('pin'),ctx=c.getContext('2d'),W=1000,H=1500;
+  bgBase(ctx,W,H);glow(ctx,W/2,H*0.3,400,ACCENT,0.15);
+  dots(ctx,40,80,8,5,70);accentLines(ctx,W,H);
+  broom(ctx,W/2,H*0.26,120,ACCENT);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 88px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W/2,H*0.455);
+  ctx.font='32px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.62)';
+  ctx.fillText('Free Windows Cleaner · v3.6',W/2,H*0.508);
+  ctx.strokeStyle='rgba(0,230,118,0.15)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W*0.1,H*0.54);ctx.lineTo(W*0.9,H*0.54);ctx.stroke();
+  const feats=['🧹  Temp, Cache & Browser Cleanup','📦  3rd Party Apps (NEW in v3.6)','🔄  Software Updater (winget)','🔍  Junk Scanner with Clean Option','💻  System Info — RAM & Disk','🌐  29 Languages · 4 Themes','🔐  PIN Lock & Dry Run Mode','⚙  Scheduler & Auto-Update','📦  Games, Adobe, Media & Dev Caches','🆓  100% Free & Open Source (MIT)'];
+  ctx.textAlign='left';ctx.textBaseline='top';
+  feats.forEach((f,i)=>{
+    ctx.fillStyle=i<2?ACCENT:'rgba(255,255,255,0.82)';
+    ctx.font=i<2?'bold 30px "Segoe UI",Arial':'30px "Segoe UI",Arial';
+    ctx.fillText(f,W*0.1,H*0.572+i*72);
+  });
+  ctx.textAlign='center';ctx.textBaseline='bottom';
+  ctx.font='bold 22px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.4)';
+  ctx.fillText('github.com/yashwanthramsomireddy/PurgeKit',W/2,H-20);
+})();
+
+// ══ WHATSAPP 800×800 ══════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('wa'),ctx=c.getContext('2d'),W=800,H=800;
+  bgBase(ctx,W,H);glow(ctx,W/2,H/2,340,ACCENT,0.15);
+  ctx.strokeStyle='rgba(0,230,118,0.25)';ctx.lineWidth=3;ctx.strokeRect(12,12,W-24,H-24);
+  broom(ctx,W/2,H*0.34,110,ACCENT);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 78px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W/2,H*0.565);
+  ctx.font='28px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.fillText('Free Windows Cleaner · v3.6',W/2,H*0.638);
+  ctx.font='22px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.4)';
+  ctx.fillText('📦 Now with 3rd Party App Cache Cleaner!',W/2,H*0.72);
+  ctx.font='20px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.45)';
+  ctx.fillText('github.com/yashwanthramsomireddy/PurgeKit',W/2,H*0.88);
+})();
+
+// ══ ICON 512×512 ══════════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('icon512'),ctx=c.getContext('2d'),W=512,H=512;
+  ctx.beginPath();ctx.arc(W/2,H/2,W/2,0,Math.PI*2);ctx.fillStyle='#0a0a0a';ctx.fill();
+  ctx.strokeStyle=ACCENT;ctx.lineWidth=10;ctx.stroke();
+  ctx.beginPath();ctx.arc(W/2,H/2,W/2-16,0,Math.PI*2);ctx.strokeStyle='rgba(0,230,118,0.2)';ctx.lineWidth=2;ctx.stroke();
+  broom(ctx,W/2,H/2,160,ACCENT);
+})();
+
+// ══ YT BANNER 2560×1440 ═══════════════════════════════════════
+(()=>{
+  const c=document.getElementById('yt-banner'),ctx=c.getContext('2d'),W=2560,H=1440;
+  bgBase(ctx,W,H);ctx.strokeStyle='rgba(0,230,118,0.03)';grid(ctx,W,H,80);
+  glow(ctx,W/2,H/2,600,ACCENT,0.12);
+  dots(ctx,80,80,10,5,80);dots(ctx,W-80-9*80,H-80-4*80,10,5,80);
+  accentLines(ctx,W,H);
+  ctx.strokeStyle='rgba(0,230,118,0.06)';ctx.lineWidth=1;ctx.setLineDash([8,8]);
+  ctx.strokeRect((W-1546)/2,(H-423)/2,1546,423);ctx.setLineDash([]);
+  broom(ctx,W/2-520,H/2,180,ACCENT);
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.font='bold 155px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W/2-310,H/2-45);
+  ctx.font='50px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.6)';
+  ctx.fillText('Windows Temp & Cache Cleaner — Free & Open Source · v3.6',W/2-310,H/2+75);
+  ctx.font='36px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.5)';
+  ctx.fillText('github.com/yashwanthramsomireddy/PurgeKit',W/2-310,H/2+148);
+  ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.font='26px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.18)';
+  ctx.fillText('TeamExyKings · Yashwanth Ram Somireddy · Chennai, India',W-60,H-28);
+})();
+
+// ══ THUMB A — Release ══════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('thumb-a'),ctx=c.getContext('2d'),W=1280,H=720;
+  bgBase(ctx,W,H);glow(ctx,220,H/2,300,ACCENT,0.2);
+  ctx.strokeStyle='rgba(0,230,118,0.18)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(430,60);ctx.lineTo(430,H-60);ctx.stroke();
+  broom(ctx,220,H/2,155,ACCENT);
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.font='bold 108px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',452,78);
+  rr(ctx,452,208,260,52,8);ctx.fillStyle='rgba(0,230,118,0.15)';ctx.fill();
+  ctx.strokeStyle=ACCENT;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=ACCENT;ctx.font='bold 28px "Segoe UI",Arial';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('v3.6 NOW AVAILABLE',582,234);
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.font='30px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.82)';
+  ctx.fillText('New: 3rd Party Tab + Select All',452,288);
+  ctx.font='26px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('104+ tasks · Free · Open Source',452,336);
+  dots(ctx,W-180,30,4,3,50);
+  ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.font='20px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.4)';
+  ctx.fillText('TeamExyKings',W-28,H-20);
+})();
+
+// ══ THUMB B — Tutorial ═════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('thumb-b'),ctx=c.getContext('2d'),W=1280,H=720;
+  bgBase(ctx,W,H);glow(ctx,W*0.72,H/2,350,ACCENT,0.15);
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.font='bold 68px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText('How to Clean',60,H*0.34);
+  ctx.fillStyle=ACCENT;ctx.fillText('Windows Junk',60,H*0.5);
+  ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText('in 1 Click',60,H*0.66);
+  ctx.strokeStyle='rgba(0,230,118,0.2)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(680,60);ctx.lineTo(680,H-60);ctx.stroke();
+  broom(ctx,W*0.82,H*0.38,112,ACCENT);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 54px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W*0.82,H*0.65);
+  ctx.font='24px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('Free · 29 Languages',W*0.82,H*0.75);
+  dots(ctx,60,30,5,3,50);
+})();
+
+// ══ THUMB C — 3rd Party ════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('thumb-c'),ctx=c.getContext('2d'),W=1280,H=720;
+  bgBase(ctx,W,H);glow(ctx,W/2,H/2,400,ACCENT,0.12);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 52px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('📦 Clean ALL App Caches',W/2,H*0.18);
+  const apps=['🎮 Steam · Epic · GOG · Riot','🎨 Adobe · Premiere · Lightroom','💬 Slack · Signal · Telegram','🎬 OBS · DaVinci · HandBrake','🌐 Brave · Opera · Vivaldi','🔧 JetBrains · Visual Studio'];
+  apps.forEach((app,i)=>{
+    const col=i%2===0?'rgba(0,230,118,0.85)':'rgba(255,255,255,0.75)';
+    const x=i<3?W*0.27:W*0.73,y=H*0.35+Math.floor(i%3)*H*0.17;
+    rr(ctx,x-220,y-28,440,56,8);ctx.fillStyle='rgba(0,230,118,0.06)';ctx.fill();
+    ctx.strokeStyle='rgba(0,230,118,0.15)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle=col;ctx.font='26px "Segoe UI",Arial';ctx.fillText(app,x,y);
+  });
+  ctx.font='bold 34px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.fillText('PurgeKit v3.6 — 3rd Party Tab',W/2,H*0.88);
+})();
+
+// ══ THUMB D — SW Updater ═══════════════════════════════════════
+(()=>{
+  const c=document.getElementById('thumb-d'),ctx=c.getContext('2d'),W=1280,H=720;
+  bgBase(ctx,W,H);glow(ctx,W*0.35,H/2,380,ACCENT,0.15);
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  ctx.font='bold 62px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.92)';ctx.fillText('Update ALL Your',60,H*0.32);
+  ctx.fillStyle=ACCENT;ctx.font='bold 72px "Segoe UI",Arial';ctx.fillText('Windows Apps',60,H*0.5);
+  ctx.fillStyle='rgba(255,255,255,0.6)';ctx.font='30px "Segoe UI",Arial';ctx.fillText('Using Microsoft winget — Free & Official',60,H*0.67);
+  ctx.strokeStyle='rgba(0,230,118,0.18)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(780,60);ctx.lineTo(780,H-60);ctx.stroke();
+  ctx.font='bold 50px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('🔄',W*0.87,H*0.3);
+  ctx.font='bold 32px "Segoe UI",Arial';ctx.fillText('PurgeKit',W*0.87,H*0.48);
+  ctx.font='22px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillText('Software Updater',W*0.87,H*0.58);
+  ctx.font='20px "Segoe UI",Arial';ctx.fillStyle='rgba(0,230,118,0.45)';ctx.fillText('v3.6 · Free',W*0.87,H*0.68);
+  dots(ctx,W-180,30,4,3,50);
+})();
+
+// ══ WATERMARK 200×200 ══════════════════════════════════════════
+(()=>{
+  const c=document.getElementById('watermark'),ctx=c.getContext('2d'),W=200,H=200;
+  ctx.beginPath();ctx.arc(W/2,H/2,W/2,0,Math.PI*2);ctx.fillStyle='rgba(5,13,8,0.85)';ctx.fill();
+  ctx.strokeStyle='rgba(0,230,118,0.6)';ctx.lineWidth=3;ctx.stroke();
+  broom(ctx,W/2,H*0.42,52,ACCENT);
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='bold 22px "Segoe UI",Arial';ctx.fillStyle=ACCENT;ctx.fillText('PurgeKit',W/2,H*0.77);
+  ctx.font='11px "Segoe UI",Arial';ctx.fillStyle='rgba(255,255,255,0.35)';ctx.fillText('TeamExyKings',W/2,H*0.89);
+})();
+
+// ══ SOCIAL MEDIA KIT content ═══════════════════════════════════
+(()=>{
+  // Colors
+  const colors=[
+    {hex:'#00e676',name:'PurgeKit Green',use:'Primary accent'},
+    {hex:'#00c853',name:'Accent Dim',use:'Hover states'},
+    {hex:'#003916',name:'Accent Dark',use:'Chip backgrounds'},
+    {hex:'#0a0a0a',name:'Pitch Black',use:'Main background'},
+    {hex:'#f5f5f5',name:'Off White',use:'Body text'},
+  ];
+  const cr=document.getElementById('colors-row');
+  colors.forEach(c=>{
+    cr.innerHTML+=`<div class="color-swatch">
+      <div class="color-box" style="background:${c.hex};"></div>
+      <div class="color-hex">${c.hex}</div>
+      <div class="color-name">${c.name}</div>
+      <div class="color-use">${c.use}</div>
+    </div>`;
+  });
+
+  // Captions
+  const caps=[
+    {p:'🐦 Twitter/X',t:`🧹 PurgeKit v3.6 is here!
+
+New in v3.6:
+📦 3rd Party Apps tab — clean Steam, Epic, GOG, Slack, Adobe, OBS, DaVinci & more
+✔ Per-category Select All in every tab
+💛 Donate tab with auto ₹/$ detection
+
+✅ 104+ cleaning tasks
+✅ 29 Languages · 4 Themes
+✅ Free & Open Source
+
+👇 Download now
+github.com/yashwanthramsomireddy/PurgeKit
+
+#PurgeKit #Windows #OpenSource #Freeware`},
+    {p:'📸 Instagram',t:`🧹 PurgeKit v3.6 — Free Windows Cleaner!
+
+What's new:
+📦 3rd Party Apps tab
+🎮 Games: Steam, Epic, GOG, Riot
+🎨 Adobe: Premiere, Lightroom, After Effects
+💬 Slack, Signal, Telegram caches
+🎬 OBS, DaVinci Resolve, HandBrake
+🔧 JetBrains, Visual Studio
+
+Plus: per-category Select All, location-aware donate!
+
+Link in bio to download — free forever 🙌
+.
+.
+.
+#PurgeKit #Windows11 #WindowsCleaner #FreeApp #OpenSource #TeamExyKings #MadeInIndia #TechTools`},
+    {p:'💼 LinkedIn',t:`Excited to share PurgeKit v3.6!
+
+This update adds a full 3rd Party Apps tab with 6 categories:
+🎮 Games & Launchers (Steam, Epic, GOG, Riot, Battle.net, Ubisoft)
+🎨 Adobe Apps (Premiere, After Effects, Lightroom, Illustrator)
+💬 Communication (Slack, Signal, Telegram, Outlook)
+🎬 Media & Creative (OBS, DaVinci Resolve, HandBrake)
+🔧 Dev Tools (JetBrains IDEs, Visual Studio, Electron Builder)
+
+Plus per-category Select All in every section, and a location-aware donate tab that auto-detects ₹/$.
+
+All free. MIT licensed. Built with Python + CustomTkinter.
+
+🔗 github.com/yashwanthramsomireddy/PurgeKit
+
+#OpenSource #Python #Windows #SideProject #IndieHacker`},
+    {p:'📌 Pinterest',t:`🧹 PurgeKit v3.6 — Free Windows Cleaner
+
+✅ 104+ cleaning tasks
+📦 3rd Party Apps (Steam, Adobe, Slack & more)
+🔄 Software Updater via winget
+💻 System Info · RAM & Disk usage
+🌐 29 Languages · 4 Themes
+
+Download free:
+github.com/yashwanthramsomireddy/PurgeKit
+
+#Windows #FreeApps #TechTips #CleanPC`},
+  ];
+  const cc=document.getElementById('captions-container');
+  caps.forEach(cap=>{
+    cc.innerHTML+=`<div class="caption-box">
+      <div class="caption-platform">${cap.p}</div>
+      <pre class="caption-text">${cap.t}</pre>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent)">📋 Copy</button>
+    </div>`;
+  });
+
+  // Hashtags
+  const tags=[
+    {n:'🚀 Launch',t:'#PurgeKit #NewRelease #Windows11 #Windows10 #WindowsCleaner #FreeApp #OpenSource #TeamExyKings #v36'},
+    {n:'🧹 Cleaning',t:'#CleanPC #SpeedUpPC #WindowsTips #TechTips #PCMaintenance #FreeTools #CacheClean #TempFiles #3rdPartyApps'},
+    {n:'👨‍💻 Dev',t:'#Python #CustomTkinter #OpenSourceProject #IndieHacker #MadeInIndia #DevCommunity #SideProject #GitHubProject'},
+    {n:'🌐 Regional',t:'#MadeInIndia #ChennaiDev #TechFromIndia #IndianDevs #TamilTech'},
+  ];
+  const hc=document.getElementById('hashtags-container');
+  tags.forEach(t=>{
+    hc.innerHTML+=`<div class="caption-box">
+      <div class="caption-platform">${t.n}</div>
+      <div class="caption-text">${t.t}</div>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('${t.t}')">📋 Copy</button>
+    </div>`;
+  });
+
+  // Specs
+  const specs=[
+    ['Platform','Size','Use For'],
+    ['Instagram Reel/Story','1080×1920','9:16 portrait'],
+    ['Instagram Feed / Facebook','1080×1080','1:1 square'],
+    ['Twitter/X Card','1200×630','Link previews'],
+    ['Pinterest','1000×1500','2:3 portrait'],
+    ['WhatsApp / Telegram','800×800','Square'],
+    ['YouTube Banner','2560×1440','Safe zone: 1546×423'],
+    ['YouTube Thumbnail','1280×720','16:9 (4 styles)'],
+    ['App Icon','512×512','Square'],
+    ['Watermark','200×200','Bottom-right of videos'],
+  ];
+  const tbl=document.getElementById('specs-table');
+  specs.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    r.forEach(cell=>{
+      const td=document.createElement('td');
+      td.textContent=cell;
+      if(i===0){td.style.color='#00e676';td.style.fontWeight='bold';td.style.background='#003916';}
+      tr.appendChild(td);
+    });
+    tbl.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
