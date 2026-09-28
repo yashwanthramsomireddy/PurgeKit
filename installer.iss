@@ -5,7 +5,7 @@
 ; ============================================================
 
 #define MyAppName      "PurgeKit"
-#define MyAppVersion   "3.6"
+#define MyAppVersion   "3.7"
 #define MyAppPublisher "TeamExyKings"
 #define MyAppURL       "https://github.com/yashwanthramsomireddy/PurgeKit"
 #define MyAppExeName   "PurgeKit.exe"

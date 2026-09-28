@@ -63,7 +63,7 @@ from core.software_updater import (is_winget_available, get_upgradeable_apps,
                                     open_in_folder)
 from ui.themes         import get_theme
 
-APP_VERSION  = "3.6"
+APP_VERSION  = "3.7"
 GITHUB_URL   = "https://github.com/yashwanthramsomireddy/PurgeKit"
 AUTHOR_NAME  = "Yashwanth Ram Somireddy"
 AUTHOR_LOC   = "Chennai, India"
@@ -404,6 +404,7 @@ class PurgeKitApp(ctk.CTk):
         self.dry_run_var   = tk.BooleanVar(value=self.cfg.get("dry_run",False))
         self.autostart_var = tk.BooleanVar(value=get_autostart())
         self.running       = False
+        self._cancel_flag  = False
         self.reboot_needed = [False]
         self.log_lines     = []
         self._active_nav   = t(self.T,"tab_tasks")
@@ -1032,6 +1033,13 @@ class PurgeKitApp(ctk.CTk):
             text_color=th["warn"] if dry else th["accent"],
             command=self._start_purge)
         self.start_btn.pack(side="left", fill="x", expand=True, padx=(0,6))
+        self.cancel_btn = ctk.CTkButton(btn_r, text="⏹ Cancel", height=42, width=90,
+                      corner_radius=8, fg_color="#3a0000",
+                      hover_color="#5a0000", text_color=th["error"],
+                      font=ctk.CTkFont("Segoe UI",12,"bold"),
+                      state="disabled",
+                      command=self._cancel_purge)
+        self.cancel_btn.pack(side="left", padx=(0,6))
         ctk.CTkButton(btn_r, text=t(T,"save_log"), height=42, width=80,
                       corner_radius=8, fg_color=th["bg_card"],
                       hover_color=th["bg_hover"], text_color=th["text_gray"],
@@ -1089,6 +1097,7 @@ class PurgeKitApp(ctk.CTk):
                                                    scrollbar_button_color=th["accent_dark"],
                                                    scrollbar_button_hover_color=th["accent"])
         self.scan_scroll.pack(fill="both", expand=True, padx=8, pady=(0,4))
+        self.after(100, lambda f=self.scan_scroll: self._boost_scroll(f))
 
         # Bottom button row
         btn_row = ctk.CTkFrame(parent, fg_color="transparent")
@@ -1459,6 +1468,7 @@ class PurgeKitApp(ctk.CTk):
                                         scrollbar_button_color=th["accent_dark"],
                                         scrollbar_button_hover_color=th["accent"])
         scroll.pack(fill="both", expand=True, padx=8, pady=(0,4))
+        self.after(100, lambda f=scroll: self._boost_scroll(f))
 
         # Freeze redraws during bulk row creation
         try:
@@ -1654,9 +1664,12 @@ class PurgeKitApp(ctk.CTk):
                 except Exception:
                     pass
                 _progress(f"[{i+1}/{len(selected)}] {task[2]}...")
-                self._log(f"\n── {task[0]}: {task[2]}", "accent")
+                t_start = __import__('datetime').datetime.now()
+                self._log(f"\n── {task[0]}: {task[2]}  [{t_start.strftime('%H:%M:%S')}]", "accent")
                 freed = run_task(task[0], self._log, reboot, dry)
                 total_freed[0] += freed
+                elapsed_s = (__import__('datetime').datetime.now() - t_start).total_seconds()
+                self._log(f"  ⏱ {task[2]}: {elapsed_s:.1f}s — freed {fmt_size(freed)}", "dim")
                 done_count[0]  += 1
 
             try:
@@ -1685,6 +1698,7 @@ class PurgeKitApp(ctk.CTk):
                                         scrollbar_button_color=th["accent_dark"],
                                         scrollbar_button_hover_color=th["accent"])
         scroll.pack(fill="both", expand=True, padx=8, pady=(0,4))
+        self.after(100, lambda f=scroll: self._boost_scroll(f))
         ctk.CTkButton(parent, text="🔄  Refresh",
                       font=ctk.CTkFont("Segoe UI",12),
                       height=32, corner_radius=8,
@@ -1943,6 +1957,7 @@ class PurgeKitApp(ctk.CTk):
                                                   scrollbar_button_color=th["accent_dark"],
                                                   scrollbar_button_hover_color=th["accent"])
         self.upd_scroll.pack(fill="both", expand=True, padx=12, pady=(0,4))
+        self.after(100, lambda f=self.upd_scroll: self._boost_scroll(f))
         # Force correct bg — needed when theme changes dynamically
         try:
             self.upd_scroll.configure(fg_color=th["bg_darkest"])
@@ -2260,6 +2275,7 @@ class PurgeKitApp(ctk.CTk):
                                         scrollbar_button_color=th["accent_dark"],
                                         scrollbar_button_hover_color=th["accent"])
         scroll.pack(fill="both", expand=True, padx=4, pady=4)
+        self.after(100, lambda f=scroll: self._boost_scroll(f))
 
         def section(title, color=None):
             ctk.CTkLabel(scroll, text=title,
@@ -2442,6 +2458,7 @@ class PurgeKitApp(ctk.CTk):
                                         scrollbar_button_color=th["accent_dark"],
                                         scrollbar_button_hover_color=th["accent"])
         scroll.pack(fill="both", expand=True, padx=4, pady=4)
+        self.after(100, lambda f=scroll: self._boost_scroll(f))
 
         try:
             acc = tuple(int(th["accent"].lstrip("#")[i:i+2],16) for i in (0,2,4))
@@ -2663,6 +2680,20 @@ class PurgeKitApp(ctk.CTk):
         self._set_window_size()
         self._build_content()
 
+    def _boost_scroll(self, frame):
+        """Boost scroll speed on CTkScrollableFrame — fixes FPS lag."""
+        try:
+            canvas = frame._parent_canvas
+            def _fast_scroll(event):
+                # 4x faster than default
+                canvas.yview_scroll(int(-4*(event.delta/120)), "units")
+                return "break"
+            # Bind to canvas and all children recursively
+            canvas.bind("<MouseWheel>", _fast_scroll, add="+")
+            frame.bind("<MouseWheel>", _fast_scroll, add="+")
+        except Exception:
+            pass
+
     def _toggle_autostart(self):
         ok = set_autostart(self.autostart_var.get())
         if not ok:
@@ -2774,7 +2805,7 @@ class PurgeKitApp(ctk.CTk):
         webbrowser.open(GITHUB_URL)
 
     def _save_log_manual(self):
-        path = write_log(self.log_lines)
+        path = write_log(self.log_lines, version=APP_VERSION)
         if path:
             messagebox.showinfo(t(self.T,"log_saved"),
                                 t(self.T,"log_saved_to", path=path))
@@ -2912,6 +2943,34 @@ class PurgeKitApp(ctk.CTk):
         threading.Thread(target=_download, daemon=True).start()
 
     # ── Purge Engine ─────────────────────────────────────────
+    def _set_ui_locked(self, locked):
+        """Lock/unlock UI controls during purge to prevent interference."""
+        state = "disabled" if locked else "normal"
+        try:
+            # Lock compact toggle, dry run toggle, theme switch
+            for widget in self.winfo_children():
+                if hasattr(widget, '_name') and 'switch' in str(widget._name).lower():
+                    widget.configure(state=state)
+        except Exception:
+            pass
+        # Lock the topbar switches
+        try:
+            if locked:
+                self.compact_mode_switch_locked = True
+            else:
+                self.compact_mode_switch_locked = False
+        except Exception:
+            pass
+
+    def _cancel_purge(self):
+        """Signal the running purge to stop after current task."""
+        self._cancel_flag = True
+        try:
+            self.cancel_btn.configure(state="disabled", text="Cancelling...")
+        except Exception:
+            pass
+        self._log("  ⏹ Cancel requested — stopping after current task...", "warn")
+
     def _start_purge(self):
         if self.running:
             return
@@ -2921,9 +2980,16 @@ class PurgeKitApp(ctk.CTk):
             messagebox.showwarning(t(self.T,"nothing_selected"), t(self.T,"select_one"))
             return
         self.running = True
+        self._cancel_flag = False
         dry = self.dry_run_var.get()
         self.start_btn.configure(text=t(self.T,"running"), state="disabled",
                                   fg_color="#002510", text_color=self.th["text_gray"])
+        try:
+            self.cancel_btn.configure(state="normal")
+        except Exception:
+            pass
+        # Lock UI controls during purge
+        self._set_ui_locked(True)
         self.reboot_needed = [False]
         threading.Thread(target=self._purge_thread,
                          args=(selected, sel_drives, dry), daemon=True).start()
@@ -2943,6 +3009,9 @@ class PurgeKitApp(ctk.CTk):
         self._log("═"*50, "accent")
 
         for task in TASKS:
+            if self._cancel_flag:
+                self._log("  ⏹ Purge cancelled by user.", "warn")
+                break
             tid = task[0]
             if tid not in selected:
                 continue
@@ -3044,6 +3113,8 @@ class PurgeKitApp(ctk.CTk):
         self._log("═"*50, "accent")
         complete_key = "dry_run_complete" if dry_run else "purge_complete"
         self._log(f"  {t(T,complete_key)}", "success")
+        # Auto-save log after purge
+        write_log(self.log_lines, version=APP_VERSION)
         self._log(f"  {t(T,'space_freed')}: {freed_str}", "success")
         self._log(f"  {t(T,'time_taken')}: {elapsed_str}", "dim")
         if log_path:
@@ -3061,6 +3132,12 @@ class PurgeKitApp(ctk.CTk):
                 state="normal",
                 fg_color="#3a2000" if dry else th["accent_dark"],
                 text_color=th["warn"] if dry else th["accent"])
+            try:
+                self.cancel_btn.configure(state="disabled", text="⏹ Cancel")
+            except Exception:
+                pass
+            self._set_ui_locked(False)
+            self._cancel_flag = False
             self.running = False
         self.after(0, _re)
 

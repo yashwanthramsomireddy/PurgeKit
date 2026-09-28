@@ -1,5 +1,5 @@
 """
-PurgeKit v3.0 — Log Manager
+PurgeKit v3.7 — Log Manager
 MIT License — TeamExyKings
 Saves logs to: Downloads/PurgeKit/Logs/PurgeKit_YYYYMMDD_HHMMSS.txt
 """
@@ -12,7 +12,12 @@ GITHUB_URL   = "https://github.com/yashwanthramsomireddy/PurgeKit"
 AUTHOR_NAME  = "Yashwanth Ram Somireddy"
 AUTHOR_LOC   = "Chennai, India"
 AUTHOR_BRAND = "TeamExyKings"
-APP_VERSION  = "3.0"
+# Import version dynamically from main app config
+try:
+    from core.config import get_app_version
+    APP_VERSION = get_app_version()
+except Exception:
+    APP_VERSION = "3.7"
 
 def get_log_dir():
     log_dir = os.path.join(os.path.expanduser("~"), "Downloads", "PurgeKit", "Logs")
@@ -28,7 +33,7 @@ def write_log(log_lines: list, extra_summary: str = ""):
     try:
         with open(path, "w", encoding="utf-8") as f:
             f.write("=" * 60 + "\n")
-            f.write(f"  PurgeKit v{APP_VERSION}  |  MIT License  |  {AUTHOR_BRAND}\n")
+            f.write(f"  PurgeKit v{version or APP_VERSION}  |  MIT License  |  {AUTHOR_BRAND}\n")
             f.write(f"  Built with love by {AUTHOR_NAME}, {AUTHOR_LOC}\n")
             f.write(f"  GitHub  : {GITHUB_URL}\n")
             f.write(f"  Saved   : {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")

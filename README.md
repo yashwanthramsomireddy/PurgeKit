@@ -1,217 +1,215 @@
+<div align="center">
+
 # 🧹 PurgeKit
 
-> A lightweight, open-source Windows temp and cache cleaner with a modern GUI.
-> Built by [Yashwanth Ram Somireddy](https://github.com/yashwanthramsomireddy) — Chennai, India (TeamExyKings)
+**Free, open-source Windows temp & cache cleaner**
 
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)
-![Version](https://img.shields.io/badge/Version-3.6-orange.svg)
-![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)
+![Version](https://img.shields.io/badge/Version-3.7.1-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.11%2B-yellow.svg)
+![Built with](https://img.shields.io/badge/Built%20with-CustomTkinter-purple.svg)
+
+[⬇ Download](#download) · [📋 Changelog](CHANGELOG.md) · [🐛 Report Bug](https://github.com/yashwanthramsomireddy/PurgeKit/issues) · [💛 Donate](#donate)
+
+</div>
+
+---
+
+## What is PurgeKit?
+
+PurgeKit is a free, open-source Windows system cleaner with a modern dark GUI. It removes temporary files, browser caches, app caches, system logs, 3rd party app caches, Adobe caches, and outdated installer files — all in one click, with full transparency and zero cost.
+
+> **Free forever. No ads. No subscription. No bloat.**
 
 ---
 
 ## ✨ Features
 
-- ✅ **Modern GUI** — pitch black dark theme with Green / Blue / Purple accent
-- ✅ **29 Languages** — English, Tamil, Telugu, Hindi, and 25 more
-- ✅ **Auto-update** — detects and installs new releases automatically
-- ✅ **First run wizard** — pick language, theme, and options on first launch
-- ✅ **PIN Lock** — 6-digit app lock with SHA-256 hash, 3-attempt lockout
-- ✅ **Dry Run mode** — preview what will be deleted without deleting anything
-- ✅ **Junk Scanner** — scans and ranks top junk folders by size, clean directly from results
-- ✅ **Folder size per task** — shows size of each folder before cleaning
-- ✅ **Total size counter** — shows total space that will be freed before purge
-- ✅ **3-Technique force delete** — robocopy → takeown → reboot schedule
-- ✅ **Per-drive Disk Cleanup** — select which drives to clean
-- ✅ **Scheduler** — weekly/monthly auto-purge via Windows Task Scheduler
-- ✅ **Whitelist** — exclude any folder from being cleaned
-- ✅ **Remember last selection** — restores task choices on reopen
-- ✅ **Windows toast notification** — shows space freed after purge
-- ✅ **Log files** — saved to `Downloads\PurgeKit\Logs\` after every run
-- ✅ **CLI silent mode** — `PurgeKit.exe --silent` for automation
-- ✅ **Compact / Spacious** view toggle
-- ✅ `C:\Downloads` is **never touched**
-- ✅ **System Info tab** — RAM, disk usage, OS info, uptime, processor
-- ✅ **Donate button** — Location-aware: ₹ Razorpay (India) / $ PayPal (International)
+- ✅ **160+ cleaning tasks** across 11 phases
 - ✅ **3rd Party Apps tab** — Games, Communication, Adobe, Media, Dev Tools caches
-- ✅ **Per-category Select All / Deselect All** — in Tasks and 3rd Party tabs
 - ✅ **Software Updater** — winget-based, downloads official installer, open to install
+- ✅ **Per-category Select All / Deselect All** — in Tasks and 3rd Party tabs
+- ✅ **Cancel button** — stop purge cleanly after current task at any time
+- ✅ **Task timeout** — no task can freeze the app; 120s max per task
+- ✅ **Per-task timing in log** — see exactly how long each task took
+- ✅ **29 Languages** — live switch in Settings
+- ✅ **4 Themes** — Green / Blue / Purple / White (light mode)
+- ✅ **Dry Run mode** — preview what will be deleted without deleting
+- ✅ **Junk Scanner** — scan and rank folders by size, clean selected
+- ✅ **System Info** — RAM, disk usage, OS version, uptime, processor
+- ✅ **PIN Lock** — 6-digit PIN, SHA-256, 3-attempt lockout
+- ✅ **Scheduler** — weekly/monthly auto-purge via Windows Task Scheduler
+- ✅ **Whitelist** — exclude any folder from all cleaning
+- ✅ **Auto-Update** — downloads and relaunches from GitHub releases
+- ✅ **Donate — location-aware** — ₹ Razorpay for India / $ PayPal for International
+- ✅ **Inno Setup installer** — Start Menu + Desktop shortcut + uninstall support
 
 ---
 
 ## 📋 What It Cleans
 
-### Phase 1 — System Level
+> **11 cleaning phases, 160+ tasks total**
 
-| ID | Category | Path |
-|---|---|---|
-| S1 | Windows System Temp | `C:\Windows\Temp` |
-| S2 | Prefetch Files | `C:\Windows\Prefetch` |
-| S3 | Windows Update Cache | `C:\Windows\SoftwareDistribution\Download` |
-| S4 | Delivery Optimization Files | `C:\Windows\SoftwareDistribution\DeliveryOptimization` |
-| S5 | Windows Error Reporting | `C:\ProgramData\Microsoft\Windows\WER` |
-| S6 | CBS Logs | `C:\Windows\Logs\CBS` |
-| S7 | Crash Dumps | `C:\Windows\Minidump` + `MEMORY.DMP` |
-| S8 | Windows Font Cache | `C:\Windows\ServiceProfiles\LocalService\AppData\Local\FontCache` |
-| S9 | SoftwareDistribution Logs | `C:\Windows\SoftwareDistribution\DataStore\Logs` |
-| S10 | Windows Installer Patch Cache | `C:\Windows\Installer\$PatchCache$` |
-| S11 | DNS Cache | Flushed via `ipconfig /flushdns` |
+### Phase 1 — System (S1-S11) ✅ On by default
+Windows Temp, Prefetch, Windows Update Cache, Delivery Optimization, WER, CBS Logs, Crash Dumps, Font Cache, DataStore Logs, Installer Patch Cache, DNS Cache
 
-### Phase 2 — User Level
+### Phase 2 — User (U1-U45) ✅ On by default
+User Temp, Thumbnails, Recent Files, WebCache, INetCache, DirectX Cache, Teams, VS Code, Office, Spotify, Icon Cache, Clipboard, Store Cache, Zoom, Discord, WhatsApp, OneDrive, Defender History, Update Logs, Downloaded Installations, SquirrelTemp, iTunes, DISM Logs, MeasuredBoot, Diagnostics, LocalService Temp, NetworkService Temp, Jump Lists, Temp Low, CrashRpt, Extension Storage, Teams Addin, CEF, VS Code Workspace, ConnectedDevices, UWP App Caches
 
-| ID | Category | Path |
-|---|---|---|
-| U1 | User Temp Folder | `%TEMP%` |
-| U1b | LocalAppData Temp | `%LOCALAPPDATA%\Temp` |
-| U2 | Thumbnail Cache | `%LOCALAPPDATA%\Microsoft\Windows\Explorer` |
-| U3 | Recent Files & Jump Lists | `%APPDATA%\Microsoft\Windows\Recent` |
-| U4 | IE / Edge WebCache | `%LOCALAPPDATA%\Microsoft\Windows\WebCache` |
-| U4b | IE / Legacy INetCache | `%LOCALAPPDATA%\Microsoft\Windows\INetCache` |
-| U5 | DirectX Shader Cache | `%LOCALAPPDATA%\D3DSCache` |
-| U5b | User Crash Dumps | `%LOCALAPPDATA%\CrashDumps` |
-| U6 | Microsoft Teams Cache | `%APPDATA%\Microsoft\Teams\Cache` |
-| U7 | VS Code Cache | `%APPDATA%\Code\Cache` |
-| U8 | Microsoft Office Cache | `%LOCALAPPDATA%\Microsoft\Office\16.0\OfficeFileCache` |
-| U9 | Spotify Cache | `%LOCALAPPDATA%\Spotify\Storage` |
-| U10 | Icon Cache | `%LOCALAPPDATA%\IconCache.db` |
-| U11 | Clipboard History | Windows Clipboard |
-| U12 | Windows Store Cache | `wsreset.exe` |
+### Phase 3 — Browser (B1-B3b) ✅ On by default
+Chrome (Cache + Service Worker), Firefox (cache2 + startupCache), Edge (Cache + Service Worker)
 
-### Phase 3 — Browser Level
+### Phase 4 — Developer (D1-D11) ☐ Off by default
+npm, pip, Maven, Gradle, Docker, NuGet HTTP, NuGet Packages, Yarn, pnpm, Cargo, Android Studio
 
-| ID | Browser | What Is Cleared |
-|---|---|---|
-| B1 | Google Chrome | Cache, Code Cache, GPUCache |
-| B1b | Google Chrome | Service Worker CacheStorage |
-| B2 | Mozilla Firefox | cache2, startupCache, jumpListCache (all profiles) |
-| B3 | Microsoft Edge | Cache, Code Cache, GPUCache |
-| B3b | Microsoft Edge | Service Worker CacheStorage |
+### Phase 5 — 3rd Party (T1-T19) ☐ Off by default
+Slack, Postman, Skype, Google Drive, Dropbox, Figma, WebEx, Brave, Vivaldi, Opera, Chrome Canary, NVIDIA DXCache/GLCache/Temp, AMD DxCache, Teams Meeting Add-in, Spotify UWP, CrashRpt
 
-### Phase 4 — Developer Tools (unchecked by default)
+### Phase 6 — Adobe (A1-A12) ☐ Off by default
+Media Cache, Acrobat DC, Premiere Pro, After Effects, Illustrator, InDesign, XD, Lightroom, Bridge, Creative Cloud Logs, CoreSync Cache
 
-| ID | Category | Path |
-|---|---|---|
-| D1 | npm Cache | `%APPDATA%\npm-cache` |
-| D2 | pip Cache | `%LOCALAPPDATA%\pip\cache` |
+### Phase 7 — Optional (O1-O11) ☐ Off by default
+Event Logs, Recycle Bin, Telemetry, Cortana, ARP, NetBIOS, Winsock, Search Index, Skype Full, Adobe Common Full
 
-### Phase 5 — Optional / Power User (unchecked by default)
-
-| ID | Category | Note |
-|---|---|---|
-| O1 | Event Logs | App, System, Security logs |
-| O2 | Recycle Bin | All drives |
-| O3 | Windows Telemetry | `C:\ProgramData\Microsoft\Diagnosis` |
-| O4 | Cortana / Search History | Windows Search cache |
-| O5 | ARP Cache | Flushed via `arp -d *` |
-| O6 | NetBIOS Cache | Flushed via `nbtstat -R` |
-| O7 | Winsock Reset | ⚠ Requires reboot |
-| O8 | Search Index Rebuild | ⚠ Search slow for hours after |
-| O9 | Extra DNS Flush | Additional DNS pass |
+### 3rd Party Apps Tab — 4 Additional Phases ☐ Off by default
+| Phase | Apps |
+|---|---|
+| 🎮 Games | Steam, Epic Games, GOG Galaxy, Riot, Battle.net, Overwolf, Origin, Ubisoft |
+| 💬 Communication | Telegram, Signal, Outlook |
+| 🎬 Media | OBS Studio, DaVinci Resolve, HandBrake, VLC |
+| 🔧 Dev Tools | JetBrains IDEs, Visual Studio, Electron Builder |
 
 ---
 
-## 🔄 Auto-Update
-
-PurgeKit checks GitHub for new releases on every launch.
-
-- If a newer version is found, an **Update Available** banner appears in the About tab
-- Click **Download & Install** — a progress bar shows download status
-- After download, the app closes, the new exe replaces the old one, and PurgeKit relaunches automatically
-- Works only with the compiled `.exe` version
-
----
-
-## 🔒 3-Technique Force Delete
-
-PurgeKit uses a cascade of 3 techniques to handle locked files:
+## 🛡 Force Delete — 3 Techniques
 
 | Technique | Method | When Used |
 |---|---|---|
-| **T1** | `robocopy /MIR` empty folder mirror | First attempt — fastest |
-| **T2** | `takeown` + `icacls` + force delete | If T1 fails |
-| **T3** | Register pending delete on next reboot | If T2 fails — reboot notice shown |
+| T1 | `robocopy /MIR` empty folder mirror | First attempt — fastest |
+| T2 | `takeown` + `icacls` + force delete | T1 fails — permissions issue |
+| T3 | Register pending delete on next reboot | T2 fails — file locked by system |
 
 ---
 
-## 🌐 Supported Languages (29)
+## 🔄 Software Updater
 
-English, Tamil, Hindi, Telugu, Kannada, Malayalam, Marathi, Bengali, Gujarati, Punjabi, Urdu, Spanish, French, German, Italian, Portuguese, Russian, Chinese (Simplified), Japanese, Korean, Arabic, Turkish, Dutch, Polish, Vietnamese, Thai, Indonesian, Malay, Swahili
+- Powered by **Microsoft winget** (official, free, no 3rd-party DB)
+- Scans all installed apps for available updates
+- Downloads official installer directly from vendor URL
+- Full HTTP redirect following (GitHub releases → CDN)
+- Real byte-level progress bar
+- User opens installer — PurgeKit never executes anything silently
+- Saves to `Downloads\PurgeKit\Installers\<AppName>\`
 
 ---
 
 ## 🎨 Themes
 
-| Theme | Accent Color |
-|---|---|
-| Green (default) | `#00e676` |
-| Blue | `#40c4ff` |
-| Purple | `#ea80fc` |
-
-Theme applies instantly without restarting the app.
+| Theme | Mode | Accent |
+|---|---|---|
+| Green (default) | Dark | `#00e676` |
+| Blue | Dark | `#40c4ff` |
+| Purple | Dark | `#ea80fc` |
+| White | Light | `#1a7a40` |
 
 ---
 
-## 🚀 How to Use
+## 🌐 Languages
 
-### Requirements
-- Windows 10 or Windows 11
-- Administrator privileges
+English, Tamil, Hindi, Telugu, Kannada, Malayalam, Marathi, Bengali, Gujarati, Punjabi, Urdu, Spanish, French, German, Italian, Portuguese, Russian, Chinese, Japanese, Korean, Arabic, Turkish, Dutch, Polish, Vietnamese, Thai, Indonesian, Malay, Swahili
 
-### Steps
+---
 
-1. Download `PurgeKit.exe` from [Releases](https://github.com/yashwanthramsomireddy/PurgeKit/releases)
-2. Double-click → Allow UAC prompt
-3. First launch opens the setup wizard (language, theme, options)
-4. Select your tasks → **START PURGE**
-5. Log is auto-saved to `Downloads\PurgeKit\Logs\` after every run
+## ⬇ Download
 
-### CLI Silent Mode
+| File | Description |
+|---|---|
+| `PurgeKit.exe` | Portable — just double-click and run |
+| `Setup_PurgeKit_v3.7.1.exe` | Windows installer — Start Menu + Desktop shortcut + uninstall |
 
-Run a full purge silently (uses last saved task selection):
+👉 **[Get latest release](https://github.com/yashwanthramsomireddy/PurgeKit/releases)**
+
+> Requires **Windows 10 or 11** with administrator privileges.
+
+---
+
+## 🏗 Build from Source
 
 ```bash
-PurgeKit.exe --silent
+# 1. Clone
+git clone https://github.com/yashwanthramsomireddy/PurgeKit.git
+cd PurgeKit
+
+# 2. Install dependencies
+pip install customtkinter Pillow pystray winotify matplotlib pyinstaller
+
+# 3. Generate icon
+python generate_icon.py
+
+# 4. Build exe
+build.bat
+
+# 5. Build installer (optional)
+# Open installer.iss in Inno Setup → Compile
+```
+
+### Version Consistency — always update all 4
+1. `APP_VERSION` in `PurgeKit.py`
+2. `CURRENT_VERSION` in `core/updater.py`
+3. `MyAppVersion` in `installer.iss`
+4. Version badge in `README.md`
+
+---
+
+## 📁 Project Structure
+
+```
+PurgeKit/
+├── PurgeKit.py              ← Main app — all UI panels (3100+ lines)
+├── generate_icon.py         ← Icon generator
+├── build.bat                ← PyInstaller build script
+├── installer.iss            ← Inno Setup installer config
+├── requirements.txt
+│
+├── core/
+│   ├── cleaner.py           ← 160+ tasks, 11 phases, force delete engine
+│   ├── config.py            ← Config, history, whitelist, PIN (SHA-256)
+│   ├── lang_manager.py      ← 29-language loader
+│   ├── log_manager.py       ← Log writer → Downloads\PurgeKit\Logs\
+│   ├── scanner.py           ← Junk folder scanner ranked by size
+│   ├── scheduler.py         ← Windows Task Scheduler integration
+│   ├── software_updater.py  ← winget scan + official URL download
+│   ├── startup_manager.py   ← Startup programs reader
+│   └── updater.py           ← GitHub API auto-update checker
+│
+├── ui/
+│   └── themes.py            ← Green / Blue / Purple / White themes
+│
+├── lang/
+│   ├── en.json              ← English (base)
+│   └── ... (29 total)
+│
+└── assets/
+    └── icon.ico
 ```
 
 ---
 
-## 📊 Log Files
+## 🗺 Roadmap
 
-Logs are saved to:
-
-```
-C:\Users\<YourName>\Downloads\PurgeKit\Logs\PurgeKit_YYYYMMDD_HHMMSS.txt
-```
-
-Each log includes machine name, username, OS version, space freed per step, technique used, and a summary at the end.
-
----
-
-## 🛡️ Safety Notes
-
-- Windows services are stopped before cleaning and restarted after
-- Browsers are force-closed before cache cleaning to avoid file locks
-- `C:\Downloads` and user documents are **never touched**
-- Bookmarks, passwords, browser history, and extensions are **never deleted**
-- Only cache and temp files are removed
-- Dangerous system files (`System32`, `Installer` folder, driver cache, page file) are excluded entirely
-
----
-
-## 🗺️ Roadmap
-
-- [x] v1.0 — Initial `.bat` script cleaner
-- [x] v1.1 — Y/N per step, 3-technique force delete, all temp folders, activity history
-- [x] v2.0 — Python GUI (CustomTkinter), dark theme, progress bar, log panel
-- [x] v2.1 — Per-drive disk cleanup, About tab, optional items, auto-start toggle
-- [x] v2.2 — Compact default, drive detection fix, Service Worker cache, npm/pip cache
-- [x] v3.0 — 29 languages, 3 themes, first run wizard, PIN lock, dry run, junk scanner, scheduler, auto-update check, whitelist, CLI silent mode
-- [x] v3.1 — Sidebar nav (spacious), tab spacing fix, scan Clean Selected, size per row, taskbar icon fix, theme live apply
-- [x] v3.1.x — Startup tab removed, history tab removed, size scan fixes, Optional/Dev always unchecked
-- [x] v3.2 — Auto-update with download + install + relaunch, download progress bar
-- [x] v3.3 — New cache locations (Zoom, Discord, WhatsApp, OneDrive, Defender, Teams 2.0, Maven, Gradle, Docker), System Info tab, donate button, Inno Setup installer fix
-- [x] v3.3.1 — Version consistency fix, SysInfo tab renamed, README + CHANGELOG updated
+- [x] v3.0 — 29 languages, wizard, PIN, scanner, scheduler
+- [x] v3.2 — Auto-update from GitHub
+- [x] v3.4 — Software Updater (winget)
+- [x] v3.5 — White theme, official URL download
+- [x] v3.5.3 — 104+ tasks, 3rd Party + Adobe phases
+- [x] v3.6 — 3rd Party Apps tab, per-category Select All, location-aware donate
+- [x] v3.7 — Cancel button, task timeout, UWP caches, scroll FPS boost
+- [x] v3.7.1 — Bug fixes: subfolder error, A6 path, log version, Store popup
 - [ ] v4.0 — System tray, portable mode, multi-language installer
+- [ ] v4.1 — Secure delete (DoD 3-pass), disk health check
+- [ ] v4.2 — PDF report export, run history analytics
+- [ ] Future — Pro version (Supabase + Razorpay + Brevo) — TBD
 
 ---
 
@@ -225,73 +223,29 @@ Each log includes machine name, username, OS version, space freed per step, tech
 
 ---
 
-## 📁 Project Structure
+## 💛 Donate
 
-```
-PurgeKit/
-├── PurgeKit.py            # Main application
-├── generate_icon.py       # Run before building to create icon
-├── build.bat              # Build script (PyInstaller)
-├── installer.iss          # Inno Setup installer config
-├── requirements.txt       # Python dependencies
-├── README.md
-├── LICENSE
-├── CHANGELOG.md
-├── core/
-│   ├── cleaner.py         # All cleaning logic + task definitions
-│   ├── config.py          # Config, history, whitelist, PIN management
-│   ├── lang_manager.py    # Language loader
-│   ├── log_manager.py     # Log file writer
-│   ├── scanner.py         # Junk folder scanner
-│   ├── scheduler.py       # Windows Task Scheduler integration
-│   ├── startup_manager.py # Startup programs reader
-│   └── updater.py         # Auto-update checker + downloader
-├── ui/
-│   └── themes.py          # Green, Blue, Purple theme definitions
-└── lang/
-    ├── en.json            # English
-    ├── ta.json            # Tamil
-    ├── hi.json            # Hindi
-    └── ... (29 total)
-```
+PurgeKit is and will always remain **100% free**. If it saved you time or disk space, consider supporting:
+
+| Platform | Link | Currency |
+|---|---|---|
+| 💛 PayPal | [paypal.me/yash92duster](https://www.paypal.com/paypalme/yash92duster) | $ / ₹ |
+| 💸 Razorpay | [rzp.io/rzp/TEVSyhk](https://rzp.io/rzp/TEVSyhk) | ₹ (India) |
+
+The app auto-detects your country and shows the right option first.
 
 ---
 
-## 🔧 Building from Source
+## 📜 License
 
-```bash
-# Install dependencies
-pip install customtkinter Pillow pystray winotify matplotlib pyinstaller
-
-# Generate icon
-python generate_icon.py
-
-# Build exe
-pyinstaller --onefile --windowed --name "PurgeKit" --uac-admin --icon "assets\icon.ico" --add-data "lang;lang" PurgeKit.py
-```
-
-Or just run `build.bat`.
+MIT License — free to use, modify, and distribute.
 
 ---
 
-## 📄 License
+<div align="center">
 
-MIT License — see [LICENSE](LICENSE) for details.
+**Built with ❤️ by [Yashwanth Ram Somireddy](https://linkedin.com/in/yashwanth-ram-somireddy-15121b215), Chennai, India**
 
----
+**[TeamExyKings](https://teamexykings.in) · [GitHub](https://github.com/yashwanthramsomireddy/PurgeKit)**
 
-## ⚠️ Disclaimer
-
-PurgeKit deletes temporary and cache files only. It is provided **as-is** without warranty. Always ensure important data is backed up. The authors are not responsible for any unintended data loss.
-
----
-
-## 👤 Author
-
-**Yashwanth Ram Somireddy**
-Chennai, India — TeamExyKings
-GitHub: [@yashwanthramsomireddy](https://github.com/yashwanthramsomireddy)
-
----
-
-*If PurgeKit helped you, give it a ⭐ on GitHub!*
+</div>

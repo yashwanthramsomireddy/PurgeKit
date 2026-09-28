@@ -1,5 +1,5 @@
 """
-PurgeKit v3.0 — Cleaning Engine
+PurgeKit v3.7 — Cleaning Engine
 MIT License — TeamExyKings
 """
 
@@ -165,7 +165,7 @@ TASKS = [
     ("U9",  "User",      "Spotify Cache",                    r"%LOCALAPPDATA%\Spotify\Storage",                                  True,  True,  None),
     ("U10", "User",      "Icon Cache",                       r"%LOCALAPPDATA%\IconCache.db",                                     True,  True,  None),
     ("U11", "User",      "Clipboard History",                "Windows Clipboard",                                                False, True,  None),
-    ("U12", "User",      "Windows Store Cache (wsreset)",    "Microsoft Store",                                                  False, True,  None),
+    ("U12", "User",      "Windows Store Cache",    "Microsoft Store",                                                  False, True,  None),
     ("B1",  "Browser",   "Chrome — Cache + Code + GPU",      r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache",            True,  True,  None),
     ("B1b", "Browser",   "Chrome — Service Worker Cache",    r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker",   True,  True,  None),
     ("B2",  "Browser",   "Firefox — Cache (All Profiles)",   r"%LOCALAPPDATA%\Mozilla\Firefox\Profiles",                         True,  True,  None),
@@ -173,9 +173,6 @@ TASKS = [
     ("B3b", "Browser",   "Edge — Service Worker Cache",      r"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker",  True,  True,  None),
     ("D1",  "Developer", "npm Cache",                        r"%APPDATA%\npm-cache",                                             True,  False, "Clears npm package cache. Packages re-download when needed."),
     ("D2",  "Developer", "pip Cache",                        r"%LOCALAPPDATA%\pip\cache",                                        True,  False, "Clears pip package cache. Packages re-download when needed."),
-    ("D3",  "Developer", "Maven Cache",                      r"%USERPROFILE%\.m2\repository",                                    False, False, "Clears Maven local repository cache. Packages re-download when needed."),
-    ("D4",  "Developer", "Gradle Cache",                     r"%USERPROFILE%\.gradle\caches",                                    False, False, "Clears Gradle build cache. Re-downloads on next build."),
-    ("D5",  "Developer", "Docker Logs",                      r"%LOCALAPPDATA%\Docker\log",                                       False, False, "Clears Docker Desktop log files."),
     ("D3",  "Developer", "Maven Cache",                      r"%USERPROFILE%\.m2\repository",                                    False, False, "Clears Maven local repository cache. Packages re-download when needed."),
     ("D4",  "Developer", "Gradle Cache",                     r"%USERPROFILE%\.gradle\caches",                                    False, False, "Clears Gradle build cache. Re-downloads on next build."),
     ("D5",  "Developer", "Docker Logs",                      r"%LOCALAPPDATA%\Docker\log",                                       False, False, "Clears Docker Desktop log files."),
@@ -194,21 +191,11 @@ TASKS = [
     ("U16", "User",      "WhatsApp Desktop Cache",           r"%APPDATA%\WhatsApp\Cache",                                        True,  True,  None),
     ("U17", "User",      "OneDrive Logs",                    r"%LOCALAPPDATA%\Microsoft\OneDrive\logs",                         True,  True,  None),
     ("U18", "User",      "Teams 2.0 Cache",                  r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache",       True,  True,  None),
-    ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History\Store",True, True, None),
     ("U20", "User",      "Windows Update Logs",              r"C:\Windows\Logs\WindowsUpdate",                                  True,  True,  None),
     ("U21", "User",      "Downloaded Installations Cache",   r"%LOCALAPPDATA%\Downloaded Installations",                  True,  True,  None),
     ("U22", "User",      "Squirrel Temp (App Installer Cache)",r"%LOCALAPPDATA%\SquirrelTemp",                              True,  True,  None),
     ("U23", "User",      "iTunes Cache",                     r"%LOCALAPPDATA%\Apple Computer\iTunes",                     True,  True,  None),
     ("O9",  "Optional",  "DNS Cache (Extra Flush)",          "System DNS Resolver",                                              False, False, "Additional DNS flush. Useful after VPN or network changes."),
-    ("U13", "User",      "Zoom Cache",                       r"%APPDATA%\Zoom\data",                                             True,  True,  None),
-    ("U14", "User",      "Zoom Logs",                        r"%APPDATA%\Zoom\logs",                                             True,  True,  None),
-    ("U15", "User",      "Discord Cache",                    r"%APPDATA%\discord\Cache",                                         True,  True,  None),
-    ("U15b","User",      "Discord Code Cache",               r"%APPDATA%\discord\Code Cache",                                    True,  True,  None),
-    ("U16", "User",      "WhatsApp Desktop Cache",           r"%APPDATA%\WhatsApp\Cache",                                        True,  True,  None),
-    ("U17", "User",      "OneDrive Logs",                    r"%LOCALAPPDATA%\Microsoft\OneDrive\logs",                         True,  True,  None),
-    ("U18", "User",      "Teams 2.0 Cache",                  r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache",       True,  True,  None),
-    ("U19", "User",      "Windows Defender Scan History",    r"C:\ProgramData\Microsoft\Windows Defender\Scans\History",      True,  True,  None),
-    ("U20", "User",      "Windows Update Logs",              r"C:\Windows\Logs\WindowsUpdate",                                  True,  True,  None),
     # ── User Phase additions ─────────────────────────────────
     ("U24", "User",      "Windows DISM Logs",                r"C:\Windows\Logs\DISM",                                           False, True,  None),
     ("U25", "User",      "MeasuredBoot Logs",                r"C:\Windows\Logs\MeasuredBoot",                                   False, True,  None),
@@ -254,7 +241,6 @@ TASKS = [
     ("A3",  "Adobe",     "Adobe Acrobat Cache",              r"%LOCALAPPDATA%\Adobe\Acrobat\DC\Cache",                        True,  False, None),
     ("A4",  "Adobe",     "Adobe Premiere Media Cache",       r"%APPDATA%\Adobe\Premiere Pro",                                   True,  False, "Clears Premiere Pro media cache. Regenerates on next project open."),
     ("A5",  "Adobe",     "Adobe After Effects Disk Cache",   r"%APPDATA%\Adobe\After Effects",                                  True,  False, "Clears After Effects disk cache. Regenerates on next render."),
-    ("A6",  "Adobe",     "Adobe Photoshop Temp",             r"%TEMP%",                                                           True,  False, "Photoshop temp files are in system %TEMP% — covered by U1."),
     ("A7",  "Adobe",     "Adobe Illustrator Cache",          r"%APPDATA%\Adobe\Adobe Illustrator",                              True,  False, None),
     ("A8",  "Adobe",     "Adobe InDesign Cache",             r"%LOCALAPPDATA%\Adobe\InDesign",                                  True,  False, None),
     ("A9",  "Adobe",     "Adobe XD Cache",                   r"%APPDATA%\Adobe\Adobe XD\Cache",                               True,  False, None),
@@ -266,60 +252,20 @@ TASKS = [
     ("O10", "Optional",  "Skype Media Cache (Full)",         r"%APPDATA%\Skype",                                                 True,  False, "⚠ Removes all Skype cached media. Chat history kept but media must re-download."),
     ("O11", "Optional",  "Adobe Media Cache (Full Clean)",   r"%APPDATA%\Adobe\Common",                                        True,  False, "⚠ Removes entire Adobe Common cache. Large space gain but all projects need re-cache."),
     # ── User Phase additions ─────────────────────────────────
-    ("U24", "User",      "Windows DISM Logs",                r"C:\Windows\Logs\DISM",                                           False, True,  None),
-    ("U25", "User",      "MeasuredBoot Logs",                r"C:\Windows\Logs\MeasuredBoot",                                   False, True,  None),
-    ("U26", "User",      "Windows Diagnostics Logs",         r"C:\Windows\diagnostics\system",                                  False, True,  None),
-    ("U27", "User",      "LocalService Temp",                r"C:\Windows\ServiceProfiles\LocalService\AppData\Local\Temp",  False, True,  None),
-    ("U28", "User",      "NetworkService Temp",              r"C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Temp",False, True,  None),
-    ("U29", "User",      "Jump List AutoDest",               r"%APPDATA%\Microsoft\Windows\Recent\AutomaticDestinations",      True,  True,  None),
-    ("U30", "User",      "Jump List CustomDest",             r"%APPDATA%\Microsoft\Windows\Recent\CustomDestinations",         True,  True,  None),
-    ("U31", "User",      "Temp Low Integrity",               r"%LOCALAPPDATA%\Temp\Low",                                        True,  True,  None),
-    ("U32", "User",      "CrashRpt Cache",                   r"%LOCALAPPDATA%\CrashRpt",                                         True,  True,  None),
-    ("U33", "User",      "Chrome Extension Storage",         r"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Storage\ext", True,  True,  None),
-    ("U34", "User",      "Edge Extension Storage",           r"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Storage\ext",True,  True,  None),
     # ── Developer additions ────────────────────────────────────
-    ("D6",  "Developer", "NuGet HTTP Cache",                 r"%LOCALAPPDATA%\NuGet\Cache",                                     True,  False, "Clears NuGet HTTP cache. Re-downloads when needed."),
-    ("D7",  "Developer", "NuGet Packages Store",             r"%USERPROFILE%\.nuget\packages",                                  False, False, "Clears NuGet local package store. Re-downloads on next build."),
-    ("D8",  "Developer", "Yarn Cache",                       r"%USERPROFILE%\.cache\yarn",                                      False, False, "Clears Yarn package cache. Re-downloads when needed."),
-    ("D9",  "Developer", "pnpm Cache",                       r"%LOCALAPPDATA%\pnpm-cache",                                       True,  False, "Clears pnpm package cache. Re-downloads when needed."),
-    ("D10", "Developer", "Cargo Registry Cache",             r"%USERPROFILE%\.cargo\registry\cache",                           False, False, "Clears Rust Cargo cache. Re-downloads on next build."),
-    ("D11", "Developer", "Android Studio Cache",             r"%USERPROFILE%\.android\cache",                                   True,  False, "Clears Android Studio cache files."),
     # ── 3rd Party Apps ────────────────────────────────────────
-    ("T1",  "ThirdParty","Slack Cache",                      r"%LOCALAPPDATA%\slack\Cache",                                     True,  False, None),
-    ("T2",  "ThirdParty","Slack Code Cache",                 r"%LOCALAPPDATA%\slack\Code Cache",                                True,  False, None),
-    ("T3",  "ThirdParty","Postman Cache",                    r"%LOCALAPPDATA%\Postman\Cache",                                   True,  False, None),
-    ("T4",  "ThirdParty","Skype Media Cache",                r"%APPDATA%\Skype",                                                 True,  False, "Clears Skype cached media. Chat history is kept."),
-    ("T5",  "ThirdParty","Google Drive Logs",                r"%LOCALAPPDATA%\Google\DriveFS\Logs",                            True,  False, None),
-    ("T6",  "ThirdParty","Dropbox Logs",                     r"%LOCALAPPDATA%\Dropbox\logs",                                    True,  False, None),
-    ("T7",  "ThirdParty","Figma Cache",                      r"%LOCALAPPDATA%\Figma\Cache",                                     True,  False, None),
-    ("T8",  "ThirdParty","WebEx Cache",                      r"%LOCALAPPDATA%\WebEx\cache",                                     True,  False, None),
-    ("T9",  "ThirdParty","Brave Browser Cache",              r"%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache", True, False, None),
-    ("T10", "ThirdParty","Vivaldi Cache",                    r"%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache",               True,  False, None),
-    ("T11", "ThirdParty","Opera Cache",                      r"%LOCALAPPDATA%\Opera Software\Opera Stable\Cache",              True,  False, None),
-    ("T12", "ThirdParty","Chrome Canary Cache",              r"%LOCALAPPDATA%\Google\Chrome SxS\User Data\Default\Cache",   True,  False, None),
-    ("T13", "ThirdParty","NVIDIA DXCache",                   r"%LOCALAPPDATA%\NVIDIA\DXCache",                                  True,  False, None),
-    ("T14", "ThirdParty","NVIDIA GLCache",                   r"%LOCALAPPDATA%\NVIDIA\GLCache",                                  True,  False, None),
-    ("T15", "ThirdParty","NVIDIA Temp Files",                r"%TEMP%\nvidia",                                                   True,  False, None),
-    ("T16", "ThirdParty","AMD DxCache",                      r"%LOCALAPPDATA%\AMD\DxCache",                                     True,  False, None),
-    ("T17", "ThirdParty","Teams Meeting Add-in Cache",       r"%LOCALAPPDATA%\Microsoft\Teams\meeting-addin\Cache",          True,  False, None),
-    ("T18", "ThirdParty","Spotify UWP Cache",                r"%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache", True, False, None),
-    ("T19", "ThirdParty","CrashRpt Cache",                   r"%LOCALAPPDATA%\CrashRpt",                                        True,  False, None),
     # ── Adobe Apps ────────────────────────────────────────────
-    ("A1",  "Adobe",     "Adobe Media Cache",                r"%APPDATA%\Adobe\Common\Media Cache",                            True,  False, "Clears Adobe media cache. Regenerates when opening projects."),
-    ("A2",  "Adobe",     "Adobe Media Cache Files",          r"%APPDATA%\Adobe\Common\Media Cache Files",                      True,  False, "Can be very large (GB+). Regenerates automatically."),
-    ("A3",  "Adobe",     "Adobe Acrobat DC Cache",           r"%LOCALAPPDATA%\Adobe\Acrobat\DC\Cache",                        True,  False, None),
-    ("A4",  "Adobe",     "Adobe Premiere Pro Cache",         r"%APPDATA%\Adobe\Premiere Pro",                                   True,  False, "Clears Premiere media cache. Regenerates on next project open."),
-    ("A5",  "Adobe",     "Adobe After Effects Cache",        r"%APPDATA%\Adobe\After Effects",                                  True,  False, "Clears After Effects disk cache. Regenerates on next render."),
-    ("A6",  "Adobe",     "Adobe Illustrator Cache",          r"%APPDATA%\Adobe\Adobe Illustrator",                              True,  False, None),
-    ("A7",  "Adobe",     "Adobe InDesign Cache",             r"%LOCALAPPDATA%\Adobe\InDesign",                                  True,  False, None),
-    ("A8",  "Adobe",     "Adobe XD Cache",                   r"%APPDATA%\Adobe\Adobe XD\Cache",                               True,  False, None),
-    ("A9",  "Adobe",     "Adobe Lightroom Cache",            r"%APPDATA%\Adobe\Lightroom\Cache",                              True,  False, "Clears Lightroom preview cache. Regenerates when browsing photos."),
-    ("A10", "Adobe",     "Adobe Bridge Cache",               r"%APPDATA%\Adobe\Bridge",                                         True,  False, None),
-    ("A11", "Adobe",     "Creative Cloud Desktop Logs",      r"%APPDATA%\Adobe\Creative Cloud Desktop\Logs",                  True,  False, None),
-    ("A12", "Adobe",     "Creative Cloud CoreSync Cache",    r"%LOCALAPPDATA%\Adobe\CoreSync\CoreSyncCache",                  True,  False, None),
     # ── Optional additions ─────────────────────────────────────
-    ("O10", "Optional",  "Skype Media Cache (Full)",         r"%APPDATA%\Skype",                                                 True,  False, "⚠ Removes all Skype cached media. Chat history kept, media must re-download."),
-    ("O11", "Optional",  "Adobe Common Cache (Full)",        r"%APPDATA%\Adobe\Common",                                        True,  False, "⚠ Removes entire Adobe Common cache. Large space gain but all projects need re-cache."),
+    # ── v3.7 additions ────────────────────────────────────────
+    ("U35", "User",      "Teams Meeting Addin MSIs",         r"%LOCALAPPDATA%\Microsoft\TeamsMeetingAddinMsis",                True,  True,  None),
+    ("U36", "User",      "Teams Meeting Addin Cache",        r"%LOCALAPPDATA%\Microsoft\TeamsMeetingAddin",                   True,  True,  None),
+    ("U38", "User",      "CEF Browser Cache",                r"%LOCALAPPDATA%\CEF",                                            True,  True,  None),
+    ("U40", "User",      "ConnectedDevices Platform Cache",  r"%LOCALAPPDATA%\ConnectedDevicesPlatform",                      True,  True,  None),
+    ("U41", "User",      "VS Code Workspace Storage",        r"%APPDATA%\Code\User\workspaceStorage",                       True,  False, "Clears VS Code workspace history. VS Code will forget old project states."),
+    ("U42", "User",      "VS Code Logs",                     r"%APPDATA%\Code\logs",                                          True,  True,  None),
+    ("U43", "User",      "UWP App LocalCache",               "UWP_PACKAGES_LOCALCACHE",                                         False, False, "Clears LocalCache inside each UWP/Store app folder."),
+    ("U44", "User",      "UWP App TempState",                "UWP_PACKAGES_TEMPSTATE",                                          False, False, "Clears TempState inside each UWP/Store app folder."),
+    ("U45", "User",      "UWP App INetCache",                "UWP_PACKAGES_INETCACHE",                                          False, False, "Clears INetCache inside each UWP/Store app folder."),
     # ── Games & Launchers ─────────────────────────────────────
     ("G1",  "Games",     "Steam Browser Cache",              r"%LOCALAPPDATA%\Steam\htmlcache",                                 True,  False, None),
     ("G2",  "Games",     "Steam Logs",                       r"%LOCALAPPDATA%\Steam\logs",                                     True,  False, None),
@@ -351,6 +297,7 @@ TASKS = [
     ("V3",  "DevTools",  "Visual Studio Component Cache",    r"%LOCALAPPDATA%\Microsoft\VisualStudio",                        True,  False, "Clears VS component model cache. Rebuilds on next VS launch."),
     ("V4",  "DevTools",  "Visual Studio Temp",               r"%TEMP%\VisualStudio",                                            True,  False, None),
     ("V5",  "DevTools",  "Electron Builder Cache",           r"%LOCALAPPDATA%\electron-builder",                                True,  False, None),
+    # ── v3.7 User additions ──────────────────────────────────
 ]
 
 SKIP_RECREATE = {
@@ -373,7 +320,25 @@ DISK_CLEANUP_CATS = [
     "Windows Upgrade Log Files",
 ]
 
-def run_task(tid, log_fn, reboot_flag, dry_run=False):
+def run_task(tid, log_fn, reboot_flag, dry_run=False, timeout=120):
+    """Run a single task with timeout to prevent infinite hangs."""
+    import threading as _th
+    result = [0]
+    def _inner():
+        try:
+            result[0] = _run_task_body(tid, log_fn, reboot_flag, dry_run)
+        except Exception as e:
+            log_fn(f"  ❌ Error in {tid}: {e}", "error")
+    t = _th.Thread(target=_inner, daemon=True)
+    t.start()
+    t.join(timeout=timeout)
+    if t.is_alive():
+        log_fn(f"  ⏱ TIMEOUT ({timeout}s) — skipping {tid}", "warn")
+        return 0
+    return result[0]
+
+def _run_task_body(tid, log_fn, reboot_flag, dry_run=False):
+    """Internal task body — called by run_task with timeout."""
     """Run a single task by ID. Returns bytes freed."""
     task = next((t for t in TASKS if t[0] == tid), None)
     if not task:
@@ -464,9 +429,12 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
             run("cmd /c echo. | clip")
         log_fn("  ✅ Clipboard cleared", "success")
     elif tid == "U12":
-        if not dry_run:
-            run("wsreset.exe")
-        log_fn("  ✅ Windows Store cache reset", "success")
+        # Delete Store cache directly — never call wsreset.exe (it opens the Store window)
+        store_cache = ep(r"%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache")
+        if not dry_run and os.path.exists(store_cache):
+            freed += force_delete(store_cache, log_fn, reboot_flag, dry_run)
+            recreate(store_cache)
+        log_fn("  ✅ Windows Store cache cleared", "success")
     elif tid == "B1":
         if not dry_run:
             run("taskkill /f /im chrome.exe")
@@ -554,12 +522,7 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
         freed += force_delete(ep(r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache"), log_fn, reboot_flag, dry_run)
         recreate(ep(r"%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache"))
         log_fn("  ✅ Teams 2.0 cache cleared", "success")
-    elif tid == "U19":
-        # Only clear the Store subfolder — the full History folder can take too long
-        defender_path = r"C:\ProgramData\Microsoft\Windows Defender\Scans\History\Store"
-        freed += force_delete(defender_path, log_fn, reboot_flag, dry_run)
-        recreate(defender_path)
-        log_fn("  ✅ Windows Defender scan history cleared", "success")
+
     elif tid == "U20":
         freed += force_delete(r"C:\Windows\Logs\WindowsUpdate", log_fn, reboot_flag, dry_run)
         recreate(r"C:\Windows\Logs\WindowsUpdate")
@@ -710,7 +673,7 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
         freed += force_delete(adobe_path, log_fn, reboot_flag, dry_run)
         recreate(adobe_path)
         log_fn(f"  ✅ {task[2]} cleared", "success")
-    elif tid in ("A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","A13"):
+    elif tid in ("A3","A4","A5","A7","A8","A9","A10","A11","A12","A13"):
         freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
         recreate(ep(rp))
         log_fn(f"  ✅ {task[2]} cleared", "success")
@@ -737,6 +700,28 @@ def run_task(tid, log_fn, reboot_flag, dry_run=False):
         freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
         recreate(ep(rp))
         log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("U35","U36"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("U38","U40","U41","U42"):
+        freed += force_delete(ep(rp), log_fn, reboot_flag, dry_run)
+        recreate(ep(rp))
+        log_fn(f"  ✅ {task[2]} cleared", "success")
+    elif tid in ("U43","U44","U45"):
+        # UWP wildcard — scan all Packages subfolders
+        import glob as _glob
+        packages_root = os.path.join(os.environ.get("LOCALAPPDATA",""), "Packages")
+        _uwp_map = {"U43":"LocalCache","U44":"TempState","U45":os.path.join("AC","INetCache")}
+        _uwp_sub = _uwp_map[tid]
+        _uwp_targets = _glob.glob(os.path.join(packages_root, "*", _uwp_sub))
+        _uwp_freed = 0
+        for _uwp_t in _uwp_targets:
+            if os.path.exists(_uwp_t):
+                _uwp_freed += force_delete(_uwp_t, log_fn, reboot_flag, dry_run)
+                recreate(_uwp_t)
+        freed += _uwp_freed
+        log_fn(f"  ✅ {task[2]} cleared ({len(_uwp_targets)} UWP app folders)", "success")
     else:
         freed += force_delete(rp, log_fn, reboot_flag, dry_run)
         if rp not in SKIP_RECREATE:

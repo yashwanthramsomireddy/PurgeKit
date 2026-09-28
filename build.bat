@@ -1,20 +1,28 @@
 @echo off
 :: ============================================================
-::  PurgeKit v3.1.5 — Build Script
+::  PurgeKit v3.7 — Build Script
 ::  Run from the PurgeKit folder in a normal CMD window
-::  (Do NOT run as Administrator)
+::  Do NOT run as Administrator
 :: ============================================================
 
 echo.
-echo  [PurgeKit Build] Installing dependencies...
-pip install customtkinter Pillow pystray winotify matplotlib pyinstaller --upgrade
-
+echo  ============================================================
+echo    PurgeKit v3.7 — Build
+echo    TeamExyKings
+echo  ============================================================
 echo.
-echo  [PurgeKit Build] Generating icon...
+
+echo  [1/3] Installing dependencies...
+pip install customtkinter Pillow pystray winotify matplotlib pyinstaller --upgrade --quiet
+echo  Done.
+echo.
+
+echo  [2/3] Generating icon...
 python generate_icon.py
-
+echo  Done.
 echo.
-echo  [PurgeKit Build] Compiling to .exe ...
+
+echo  [3/3] Building PurgeKit.exe...
 pyinstaller ^
     --onefile ^
     --windowed ^
@@ -27,7 +35,8 @@ pyinstaller ^
 echo.
 echo  ============================================================
 echo    Build complete!
-echo    Your exe is at: dist\PurgeKit.exe
+echo    Portable exe : dist\PurgeKit.exe
+echo    Next step    : Open installer.iss in Inno Setup → Compile
 echo  ============================================================
 echo.
 pause
